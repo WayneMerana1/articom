@@ -377,7 +377,7 @@ const paypal = require('@paypal/checkout-server-sdk');
 const paypalClient = new paypal.core.PayPalHttpClient(
   new paypal.core.SandboxEnvironment(
     'AcFCxPypADxS19JnZ8JItQvNht95nd2vxQFJaNjzDgFYiPDiag9jC22XgD6wxS8mOu4rOPBLPSZjYJLp',     // replace this
-    'EH8EHzssq8DEndenI69fAV-Pt57zhOO0b-nVOk-5NCuovuO3PBV3aIepegcr-fSflA4ezWRU9bsbsr7n'  // replace this
+    'EH8EHzssq8DEndenI69fAV-Pt57zhOO0b-nVOk-5NCuovuO3PBV3aIepegcr-fSflA4ezWRU9bsbsr7n       '  // replace this
   )
 );
 
@@ -424,7 +424,7 @@ app.post('/api/paypal/capture-order', async (req, res) => {
 });
 
 // CHANGE app.listen TO server.listen
-server.listen(3000, () => {
+server.listen(process.env.PORT || 3000, () => {
     console.log('✅ ARTICOM running at http://localhost:3000');
     console.log('📁 Open: http://localhost:3000/folder_a.vscode/index.html');
 });

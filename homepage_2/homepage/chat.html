@@ -183,7 +183,10 @@
         // ── WEBSOCKET ─────────────────────────────────────────
         function connectWS() {
             try {
-                ws = new WebSocket('ws://localhost:3000');
+         var wsUrl = window.location.hostname === 'localhost'
+    ? 'ws://localhost:3000'
+    : 'wss://' + window.location.host;
+ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
                     if (currentUser.id) {
