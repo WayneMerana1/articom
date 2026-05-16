@@ -1,0 +1,22 @@
+# Dependencies — installed fresh during build
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Editor & OS
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore

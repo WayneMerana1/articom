@@ -1,2 +1,30 @@
-.vs/ 
-.vs/ 
+# Editor
+.vs/
+.vscode/
+.idea/
+
+# Dependencies — never commit these
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# OS
+.DS_Store
+Thumbs.db
