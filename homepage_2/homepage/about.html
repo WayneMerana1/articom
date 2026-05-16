@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - About Us</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .about-wrapper {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 2rem 6rem;
+        }
+
+        .about-page-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e3bfdb, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-tagline {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 3rem;
+            font-style: italic;
+        }
+
+        .about-section {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .about-section h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .about-section p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.8;
+        }
+
+        .team-grid {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .team-card {
+            background: #2f2f2f;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .team-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #6e3078;
+            margin: 0 auto 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .team-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            font-size: 12px;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .values-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .value-item {
+            background: #2f2f2f;
+            border-radius: 12px;
+            padding: 1.2rem;
+            flex: 1;
+            min-width: 160px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .value-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .value-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e3bfdb;
+            margin-bottom: 6px;
+        }
+
+        .value-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            color: white;
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="landing.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <a href="about.html" style="color:#e3bfdb; text-decoration:none; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:1px;">About Us</a>
+            <a href="/folder_a.vscode/index.html" style="background:#e3bfdb; color:white; border:none; padding:10px 28px; font-size:14px; font-weight:700; border-radius:50px; cursor:pointer; text-decoration:none; text-transform:uppercase; letter-spacing:1px; transition:all 0.3s ease; display:inline-block;">Login</a>
+        </div>
+    </nav>
+
+    <div class="about-wrapper">
+
+        <a href="landing.html" class="back-btn">← Back</a>
+
+        <h1 class="about-page-title">About Us</h1>
+        <p class="about-tagline">The story behind ARTICOM</p>
+
+        <!-- WHAT IS ARTICOM -->
+        <div class="about-section">
+            <h2>What is ARTICOM?</h2>
+            <p>
+                ARTICOM is a platform built for artists and creatives to showcase their work, connect with other artists, and find opportunities that match their craft. Whether you're an illustrator, 3D modeler, animator, or sticker artist — ARTICOM is your space to grow, collaborate, and be discovered.
+            </p>
+        </div>
+
+        <!-- OUR MISSION -->
+        <div class="about-section">
+            <h2>Our Mission</h2>
+            <p>
+                Our mission is to bridge the gap between artistic talent and real-world opportunity. We believe every creative deserves a platform that takes their work seriously — a place where art meets occupation, and passion becomes profession.
+            </p>
+        </div>
+
+        <!-- OUR VALUES -->
+        <div class="about-section">
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="value-icon">🎨</div>
+                    <div class="value-title">Creativity First</div>
+                    <div class="value-desc">We put artists and their work at the center of everything we do.</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🤝</div>
+                    <div class="value-title">Community</div>
+                    <div class="value-desc">Great art thrives in great communities. We foster connection and collaboration.</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🚀</div>
+                    <div class="value-title">Growth</div>
+                    <div class="value-desc">We give artists the tools and visibility to grow their craft and career.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THE TEAM -->
+        <div class="about-section">
+            <h2>The Team</h2>
+            <p style="margin-bottom: 1rem;">We are a small team of passionate creatives who built ARTICOM from the ground up.</p>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">👤</div>
+                    <div class="team-name">Your Name Here</div>
+                    <div class="team-role">Founder</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👤</div>
+                    <div class="team-name">Team Member</div>
+                    <div class="team-role">Developer</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👤</div>
+                    <div class="team-name">Team Member</div>
+                    <div class="team-role">Designer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="about-section">
+            <h2>Get In Touch</h2>
+            <p>Have questions or want to collaborate? Reach us at <span style="color:#e3bfdb;">hello@articom.com</span> — we'd love to hear from you.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>

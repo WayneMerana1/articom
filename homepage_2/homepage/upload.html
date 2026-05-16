@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Upload Artwork</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .upload-wrapper {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 0 2rem 5rem;
+        }
+        .upload-page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+        .upload-card {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .upload-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .drop-zone {
+            width: 100%;
+            min-height: 220px;
+            border: 2px dashed rgba(227,191,219,0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #e3bfdb;
+            background: rgba(227,191,219,0.05);
+        }
+        .drop-zone-icon { font-size: 2.5rem; }
+        .drop-zone-text { font-size: 14px; color: rgba(255,255,255,0.5); text-align: center; }
+        .drop-zone-text span { color: #e3bfdb; font-weight: 600; cursor: pointer; }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .preview-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+        .preview-item { position: relative; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-remove {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white; border: none;
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-size: 12px; font-weight: 600;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: #8b4ea6; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-group select option { background: #272222; }
+        .char-count { font-size: 11px; color: rgba(255,255,255,0.35); text-align: right; margin-top: 4px; }
+        .actions-row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn-publish {
+            background: #6e3078; color: white; border: none;
+            padding: 12px 32px; border-radius: 50px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+        }
+        .btn-publish:hover { background: #8b4ea6; transform: translateY(-2px); }
+        .btn-publish:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-cancel {
+            background: transparent; color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 32px; border-radius: 50px;
+            font-size: 15px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+        }
+        .btn-cancel:hover { color: white; border-color: rgba(255,255,255,0.5); }
+        .save-toast {
+            position: fixed; bottom: 32px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #4caf50; color: white;
+            padding: 12px 28px; border-radius: 50px;
+            font-size: 14px; font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 9999; pointer-events: none;
+        }
+        .save-toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Beeple"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Beeple</span></li>
+                        <li data-name="Loish"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Loish</span></li>
+                        <li data-name="Ross Tran"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Ross Tran</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="upload-wrapper">
+        <h1 class="upload-page-title">Upload Artwork</h1>
+
+        <!-- IMAGE DROP ZONE -->
+        <div class="upload-card">
+            <h3>Artwork Images</h3>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">🖼️</div>
+                <p class="drop-zone-text">Drag & drop your images here or <span>browse files</span></p>
+                <p class="drop-zone-text" style="font-size:12px;">PNG, JPG, GIF up to 10MB</p>
+                <input type="file" id="artworkFiles" accept="image/*" multiple>
+            </div>
+            <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
+        <!-- ARTWORK DETAILS -->
+        <div class="upload-card">
+            <h3>Artwork Details</h3>
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" id="artTitle" placeholder="Give your artwork a title" maxlength="60">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="artDesc" placeholder="Tell people about this artwork..." maxlength="300"></textarea>
+                <div class="char-count"><span id="descCount">0</span> / 300</div>
+            </div>
+            <div class="form-group">
+                <label>Category *</label>
+                <select id="artCategory">
+                    <option value="">Select a category</option>
+                    <option value="Illustrations">Illustrations</option>
+                    <option value="3D Models">3D Models</option>
+                    <option value="Animation">Animation</option>
+                    <option value="Stickers">Stickers</option>
+                    <option value="Character Design">Character Design</option>
+                    <option value="Concept Art">Concept Art</option>
+                    <option value="Fan Art">Fan Art</option>
+                    <option value="Photography">Photography</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Price (optional)</label>
+                <input type="number" id="artPrice" placeholder="e.g. 50" step="0.01">
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions-row">
+            <button class="btn-cancel" onclick="window.location.href='other-page2.html'">Cancel</button>
+            <button class="btn-publish" id="publishBtn">Publish Artwork</button>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">🎨 Artwork published!</div>
+
+    <script>
+        // ── STATE ─────────────────────────────────────────────
+        const uploadedFiles = []; // preview base64
+        const realFiles     = []; // actual File objects
+
+        // ── CHAR COUNT ────────────────────────────────────────
+        document.getElementById('artDesc').addEventListener('input', function () {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+
+        // ── DRAG & DROP ───────────────────────────────────────
+        const dropZone  = document.getElementById('dropZone');
+        const fileInput = document.getElementById('artworkFiles');
+
+        dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', function () { handleFiles(this.files); });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                realFiles.push(file);
+                const reader = new FileReader();
+                reader.onload = e => {
+                    uploadedFiles.push({ name: file.name, src: e.target.result });
+                    renderPreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPreviews() {
+            const grid = document.getElementById('previewGrid');
+            grid.innerHTML = '';
+            uploadedFiles.forEach((file, i) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `<img src="${file.src}" alt="${file.name}"><button class="preview-remove" onclick="removeFile(${i})">×</button>`;
+                grid.appendChild(item);
+            });
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            realFiles.splice(index, 1);
+            renderPreviews();
+        }
+
+        // ── PUBLISH ───────────────────────────────────────────
+        document.getElementById('publishBtn').addEventListener('click', function () {
+            const title    = document.getElementById('artTitle').value.trim();
+            const category = document.getElementById('artCategory').value;
+            const price    = document.getElementById('artPrice').value;
+            const desc     = document.getElementById('artDesc').value;
+
+            if (!title)            { alert('Please add a title.'); return; }
+            if (!category)         { alert('Please select a category.'); return; }
+            if (!realFiles.length) { alert('Please upload at least one image.'); return; }
+
+            const user = JSON.parse(localStorage.getItem('articom-user') || '{}');
+            if (!user.id) {
+                alert('Please login first!');
+                window.location.href = '/folder_a.vscode/index.html';
+                return;
+            }
+
+            const btn = document.getElementById('publishBtn');
+            btn.textContent = 'Publishing...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('user_id',     user.id);
+            formData.append('title',       title);
+            formData.append('category',    category);
+            formData.append('price',       price || '0');
+            formData.append('description', desc);
+            formData.append('image',       realFiles[0]);
+
+            fetch('/api/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const toast = document.getElementById('saveToast');
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        window.location.href = 'other-page2.html';
+                    }, 2000);
+                } else {
+                    alert('Upload failed: ' + (data.message || 'Unknown error'));
+                    btn.textContent = 'Publish Artwork';
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert('Error: ' + err);
+                btn.textContent = 'Publish Artwork';
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

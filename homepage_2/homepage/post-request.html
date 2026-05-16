@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Post a Request</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .post-wrapper {
+            max-width: 680px;
+            margin: 60px auto;
+            padding: 0 2rem 5rem;
+        }
+
+        .post-page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+
+        .post-card {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .post-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { border-color: #8b4ea6; }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .form-group select option { background: #272222; }
+
+        .char-count {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .drop-zone {
+            width: 100%;
+            min-height: 140px;
+            border: 2px dashed rgba(227,191,219,0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .drop-zone:hover { border-color: #e3bfdb; background: rgba(227,191,219,0.05); }
+        .drop-zone-icon { font-size: 2rem; }
+        .drop-zone-text { font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; }
+        .drop-zone-text span { color: #e3bfdb; font-weight: 600; }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tags-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            min-height: 44px;
+            cursor: text;
+        }
+
+        .tags-input-wrapper:focus-within { border-color: #8b4ea6; }
+
+        .tag-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #6e3078;
+            color: white;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .tag-pill button {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .tags-input-wrapper input {
+            flex: 1;
+            min-width: 80px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-post {
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-post:hover { background: #8b4ea6; transform: translateY(-2px); }
+
+        .btn-cancel {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover { color: white; border-color: rgba(255,255,255,0.5); }
+
+        .save-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #4caf50;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .save-toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="client-home.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Beeple"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Beeple</span></li>
+                        <li data-name="Loish"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Loish</span></li>
+                        <li data-name="Ross Tran"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Ross Tran</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Client</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='client-profile-view.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+  <div class="post-wrapper">
+        <h1 class="post-page-title">Post a Request</h1>
+
+        <form id="commissionForm" enctype="multipart/form-data">
+            <div class="post-card">
+                <h3>What are you looking for?</h3>
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" name="title" id="postTitle" placeholder="e.g. Game Character Design" maxlength="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea name="description" id="postText" placeholder="e.g. Looking for a 3D artist for my game project..." maxlength="500" required></textarea>
+                    <div class="char-count"><span id="textCount">0</span> / 500</div>
+                </div>
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select name="category" id="postCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="Illustrations">Illustrations</option>
+                        <option value="3D Models">3D Models</option>
+                        <option value="Animation">Animation</option>
+                        <option value="Stickers">Stickers</option>
+                        <option value="Character Design">Character Design</option>
+                        <option value="Concept Art">Concept Art</option>
+                        <option value="Fan Art">Fan Art</option>
+                        <option value="Photography">Photography</option>
+                        <option value="Logo Design">Logo Design</option>
+                        <option value="Comic Art">Comic Art</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Budget *</label>
+                    <input type="number" name="budget" id="postBudget" placeholder="e.g. 100" step="0.01" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Deadline *</label>
+                    <input type="date" name="deadline" required>
+                </div>
+                <div class="form-group">
+                    <label>Target Artist ID (optional)</label>
+                    <input type="number" name="artist_id" id="artistId" placeholder="Leave blank to post publicly">
+                </div>
+            </div>
+
+        <div class="post-card">
+            <h3>Reference Images (optional)</h3>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">🖼️</div>
+                <p class="drop-zone-text">Drag & drop or <span>browse files</span></p>
+                <p class="drop-zone-text" style="font-size:11px;">PNG, JPG up to 10MB</p>
+                <input type="file" id="imageFiles" accept="image/*" multiple>
+            </div>
+            <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
+        <div class="actions-row">
+            <button class="btn-cancel" onclick="window.location.href='client-home.html'">Cancel</button>
+            <button class="btn-post" id="postBtn">Post Request</button>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">✅ Request posted!</div>
+
+    <!-- <script src="script.js"></script> -->
+    <script>
+        var tags = [];
+        var uploadedImages = [];
+
+        // CHAR COUNT
+        document.getElementById('postText').addEventListener('input', function () {
+            document.getElementById('textCount').textContent = this.value.length;
+        });
+
+       
+
+        // IMAGE UPLOAD
+        var dropZone = document.getElementById('dropZone');
+        var fileInput = document.getElementById('imageFiles');
+
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor = '#e3bfdb'; });
+        dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor = ''; });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', function () { handleFiles(this.files); });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(function(file) {
+                if (!file.type.startsWith('image/')) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImages.push(e.target.result);
+                    renderPreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPreviews() {
+            var grid = document.getElementById('previewGrid');
+            grid.innerHTML = '';
+            uploadedImages.forEach(function(src, i) {
+                var item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = '<img src="' + src + '" alt="preview" style="border-radius:0;"><button class="preview-remove" onclick="removeImage(' + i + ')">×</button>';
+                grid.appendChild(item);
+            });
+        }
+
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            renderPreviews();
+        }
+
+        // POST BUTTON
+        document.getElementById('postBtn').addEventListener('click', function () {
+            var text     = document.getElementById('postText').value.trim();
+            var category = document.getElementById('postCategory').value;
+            var budget   = document.getElementById('postBudget').value.trim();
+
+            if (!text)     { alert('Please describe what you are looking for.'); return; }
+            if (!category) { alert('Please select a category.'); return; }
+
+            var user = {};
+            try { user = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+
+            if (!user.id) {
+                alert('Please login first!');
+                window.location.href = '/folder_a.vscode/index.html';
+                return;
+            }
+
+            fetch('/api/commission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_id:   user.id,
+                    artist_id:   null,
+                    title:       category,
+                    description: text,
+                    budget:      budget || 'Negotiable',
+                    deadline:    null
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var toast = document.getElementById('saveToast');
+                    toast.classList.add('show');
+                    setTimeout(function() {
+                        toast.classList.remove('show');
+                        window.location.href = 'client-home.html';
+                    }, 2000);
+                } else {
+                    alert('Failed to post: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(function(err) { alert('Error: ' + err); });
+        });
+    </script>
+
+ 
+</body>
+
+
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Find Your Artist</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .client-hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .client-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 30% 70%, rgba(227, 191, 219, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 20%, rgba(227, 191, 219, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .client-title {
+            font-size: clamp(3.5rem, 9vw, 7rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e3bfdb, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .client-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: rgba(255,255,255,0.85);
+            max-width: 580px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 16px 56px 16px 24px;
+            border-radius: 50px;
+            border: 2px solid rgba(227, 191, 219, 0.4);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .search-bar::placeholder { color: rgba(255,255,255,0.4); }
+        .search-bar:focus { border-color: #e3bfdb; background: rgba(255,255,255,0.12); }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .search-icon:hover { opacity: 1; }
+
+        .search-results {
+            width: 100%;
+            max-width: 520px;
+            background: #3a3535;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: none;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 2rem;
+        }
+
+        .search-results.show { display: block; }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.15s;
+        }
+
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover { background: rgba(255,255,255,0.08); }
+
+        .result-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(227,191,219,0.3);
+            flex-shrink: 0;
+        }
+
+        .result-info { flex: 1; text-align: left; }
+        .result-name { font-size: 14px; font-weight: 600; color: white; margin: 0; }
+        .result-category { font-size: 12px; color: #e3bfdb; margin: 2px 0 0; }
+        .result-empty { padding: 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; }
+
+        .client-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .browse-btn {
+            background: #e3bfdb;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(227, 191, 219, 0.4);
+            display: inline-block;
+        }
+
+        .browse-btn:hover {
+            background: #d4a8cc;
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(227, 191, 219, 0.6);
+        }
+
+        .post-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .post-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="client-home.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Beeple"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Beeple</span></li>
+                        <li data-name="Loish"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Loish</span></li>
+                        <li data-name="Ross Tran"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Ross Tran</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding: 16px;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600; font-size:14px; margin:0;">My Account</p>
+                                <p style="font-size:12px; opacity:0.6; margin:0;">Client</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-profile-edit.html'" style="width:100%; padding:9px; background:#6e3078; color:white; border:none; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='client-profile-view.html'" style="width:100%; padding:9px; background:transparent; color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:13px; cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="client-hero">
+        <h1 class="client-title">FIND YOUR<br>ARTIST</h1>
+        <p class="client-subtitle">
+            Discover talented artists for your next project. Browse illustrations, 3D models, animations, and more — all in one place.
+        </p>
+
+        <div class="search-wrapper">
+            <input type="text" class="search-bar" id="artistSearch" placeholder="Search artists by name...">
+            <span class="search-icon" onclick="doSearch()">🔍</span>
+        </div>
+
+        <div class="search-results" id="searchResults"></div>
+
+        <div class="client-actions">
+            <a href="client-browse.html" class="browse-btn">Browse Artworks</a>
+            <a href="post-request.html" class="post-btn">+ Post a Request</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        var artists = [
+            { name: 'Beeple', category: 'Illustrations', avatar: 'https://i.pravatar.cc/44?img=11' },
+            { name: 'Loish', category: '3D Models', avatar: 'https://i.pravatar.cc/44?img=12' },
+            { name: 'Ross Tran', category: 'Character Design', avatar: 'https://i.pravatar.cc/44?img=13' },
+            { name: 'Artgerm', category: 'Fan Art', avatar: 'https://i.pravatar.cc/44?img=14' },
+            { name: 'Sakimichan', category: 'Illustrations', avatar: 'https://i.pravatar.cc/44?img=15' },
+        ];
+
+        var searchInput = document.getElementById('artistSearch');
+        var resultsBox = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', doSearch);
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doSearch();
+        });
+
+        function doSearch() {
+            var query = searchInput.value.trim().toLowerCase();
+            resultsBox.innerHTML = '';
+            if (!query) { resultsBox.classList.remove('show'); return; }
+
+            var matches = artists.filter(function(a) { return a.name.toLowerCase().includes(query); });
+            resultsBox.classList.add('show');
+
+            if (!matches.length) {
+                resultsBox.innerHTML = '<div class="result-empty">No artists found.</div>';
+                return;
+            }
+
+            matches.forEach(function(artist) {
+                var item = document.createElement('div');
+                item.className = 'result-item';
+                item.innerHTML =
+                    '<img src="' + artist.avatar + '" class="result-avatar" alt="' + artist.name + '" style="border-radius:50%;width:44px;height:44px;object-fit:cover;">' +
+                    '<div class="result-info">' +
+                        '<p class="result-name">' + artist.name + '</p>' +
+                        '<p class="result-category">' + artist.category + '</p>' +
+                    '</div>';
+                item.addEventListener('click', function() {
+                    window.location.href = 'client-browse.html';
+                });
+                resultsBox.appendChild(item);
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!resultsBox.contains(e.target) && e.target !== searchInput) {
+                resultsBox.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Home</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .artist-nav {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .artist-nav-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .artist-nav-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .artist-nav-btn.primary {
+            background: #e3bfdb;
+            border-color: #e3bfdb;
+            color: white;
+        }
+
+        .artist-nav-btn.primary:hover {
+            background: #d4a8cc;
+            border-color: #d4a8cc;
+        }
+
+        .pending-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .pending-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e3bfdb;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pending-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .pending-panel.show { display: flex; }
+
+        .pending-box { background: #3a3535; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); max-height: 80vh; overflow-y: auto; }
+
+        .pending-box-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+        .pending-box-title { font-size: 1rem; font-weight: 700; color: #e3bfdb; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .pending-close { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.2rem; cursor: pointer; }
+
+        .pending-item { background: #272222; border-radius: 10px; padding: 1rem; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); }
+        .pending-item-client { font-size: 12px; color: #e3bfdb; font-weight: 600; margin-bottom: 4px; }
+        .pending-item-text { font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 6px; line-height: 1.5; }
+        .pending-item-deadline { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+        .pending-item-actions { display: flex; gap: 8px; }
+
+        .pending-done-btn { background: #4caf50; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .pending-done-btn:hover { background: #43a047; }
+
+        .pending-chat-btn { background: #6e3078; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .pending-chat-btn:hover { background: #8b4ea6; }
+
+        .pending-send-btn { background: #e3bfdb; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .pending-send-btn:hover { background: #d4a8cc; }
+
+        .pending-empty { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 2rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+
+        <div class="header-buttons">
+
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel">
+                    <input type="text" placeholder="No new notifications.." class="msg-search">
+                </div>
+            </div>
+
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages"></ul>
+                </div>
+            </div>
+
+            <div class="pending-btn-wrapper">
+                <button class="header-btn" id="pendingBtn" title="Pending Artworks">🎨</button>
+                <span class="pending-badge" id="pendingBadge">0</span>
+            </div>
+
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel" id="profilePanel">
+                    <div style="padding: 16px;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600; font-size:14px; margin:0;">My Account</p>
+                                <p style="font-size:12px; opacity:0.6; margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%; padding:9px; background:#6e3078; color:white; border:none; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%; padding:9px; background:transparent; color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:13px; cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel">
+                    <ul id="Settings"></ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <main class="hero-section">
+        <div class="hero-text">
+            <h1 class="main-title">CREATIVES AT WORK</h1>
+            <p class="subtitle">
+                A website for creative minds to join together, where art meets occupation!
+            </p>
+            <div class="artist-nav">
+                <a href="upload.html" class="artist-nav-btn primary">🎨 Upload Artwork</a>
+                <a href="find-customers.html" class="artist-nav-btn">🔍 Find Customers</a>
+                <a href="other-page2.html" class="artist-nav-btn">👤 My Profile</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- PENDING PANEL -->
+    <div class="pending-panel" id="pendingPanel">
+        <div class="pending-box">
+            <div class="pending-box-header">
+                <p class="pending-box-title">🎨 Pending Commissions</p>
+                <button class="pending-close" onclick="closePendingPanel()">✕</button>
+            </div>
+            <div id="pendingList"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function loadPending() {
+            var pending = JSON.parse(localStorage.getItem('articom-pending') || '[]');
+            var active = pending.filter(function(p) { return p.status === 'accepted' || p.status === 'pending'; });
+
+            var badge = document.getElementById('pendingBadge');
+            if (active.length > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = active.length;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            var list = document.getElementById('pendingList');
+            list.innerHTML = '';
+
+            if (!active.length) {
+                list.innerHTML = '<div class="pending-empty">No pending commissions right now.</div>';
+                return;
+            }
+
+            active.forEach(function(item, i) {
+                var div = document.createElement('div');
+                div.className = 'pending-item';
+                div.innerHTML =
+                    '<p class="pending-item-client">From: ' + (item.client || 'Client') + '</p>' +
+                    '<p class="pending-item-text">' + item.text + '</p>' +
+                    '<p class="pending-item-deadline">📅 Deadline: ' + item.deadline + '</p>' +
+                    '<div class="pending-item-actions">' +
+                        '<button class="pending-done-btn" onclick="markDone(' + i + ')">✅ Done</button>' +
+                        '<button class="pending-send-btn" onclick="window.location.href=\'transaction.html\'">💳 Send Transaction</button>' +
+                        '<button class="pending-chat-btn" onclick="window.location.href=\'chat.html\'">💬 Chat</button>' +
+                    '</div>';
+                list.appendChild(div);
+            });
+        }
+
+        function markDone(index) {
+            var pending = JSON.parse(localStorage.getItem('articom-pending') || '[]');
+            var active = pending.filter(function(p) { return p.status === 'accepted' || p.status === 'pending'; });
+            if (active[index]) {
+                var globalIndex = pending.indexOf(active[index]);
+                pending[globalIndex].status = 'done';
+                localStorage.setItem('articom-pending', JSON.stringify(pending));
+                loadPending();
+            }
+        }
+
+        document.getElementById('pendingBtn').addEventListener('click', function() {
+            loadPending();
+            document.getElementById('pendingPanel').classList.add('show');
+        });
+
+        function closePendingPanel() {
+            document.getElementById('pendingPanel').classList.remove('show');
+        }
+
+        document.getElementById('pendingPanel').addEventListener('click', function(e) {
+            if (e.target === this) closePendingPanel();
+        });
+
+        loadPending();
+    </script>
+</body>
+</html>

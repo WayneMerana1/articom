@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Transaction</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .transaction-wrapper { max-width: 780px; margin: 60px auto; padding: 0 2rem 5rem; }
+
+        .transaction-title { font-size: 2rem; font-weight: 900; color: #e3bfdb; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem; }
+
+        .t-card { background: #3a3535; border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08); }
+
+        .t-card h3 { font-size: 1rem; font-weight: 700; color: #e3bfdb; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        .client-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: #272222; border-radius: 10px; }
+        .client-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #6e3078; flex-shrink: 0; }
+        .client-name { font-size: 14px; font-weight: 700; color: white; margin: 0; }
+        .client-request { font-size: 12px; color: rgba(255,255,255,0.5); margin: 4px 0 0; }
+
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-pending { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+
+        .watermark-zone { width: 100%; min-height: 200px; border: 2px dashed rgba(227,191,219,0.3); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; box-sizing: border-box; background: #272222; }
+        .watermark-zone:hover { border-color: #e3bfdb; }
+        .watermark-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .watermark-zone-icon { font-size: 2.5rem; }
+        .watermark-zone-text { font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; }
+        .watermark-zone-text span { color: #e3bfdb; font-weight: 600; }
+
+        .preview-container { position: relative; display: none; margin-top: 1rem; border-radius: 10px; overflow: hidden; }
+        .preview-container img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 0; display: block; }
+
+        .watermark-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        .watermark-text { font-size: 3rem; font-weight: 900; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 4px; transform: rotate(-30deg); user-select: none; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #e3bfdb; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 10px 14px; background: #272222; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: white; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-group input:focus { border-color: #8b4ea6; }
+
+        .payment-methods { display: flex; gap: 12px; flex-wrap: wrap; }
+        .payment-method-card { flex: 1; min-width: 140px; background: #272222; border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .payment-method-card:hover { border-color: rgba(227,191,219,0.4); }
+        .payment-method-card.selected { border-color: #e3bfdb; background: rgba(227,191,219,0.08); }
+        .payment-method-logo { font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; }
+        .gcash-color { color: #0073C8; }
+        .paypal-color { color: #003087; }
+        .payment-method-name { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+        .payment-details { margin-top: 1rem; display: none; }
+        .payment-details.show { display: block; }
+
+        .actions-row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+
+        .btn-send { background: #6e3078; color: white; border: none; padding: 12px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-send:hover { background: #8b4ea6; transform: translateY(-2px); }
+
+        .btn-cancel { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 12px 32px; border-radius: 50px; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-cancel:hover { color: white; border-color: rgba(255,255,255,0.5); }
+
+        .save-toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: #4caf50; color: white; padding: 12px 28px; border-radius: 50px; font-size: 14px; font-weight: 600; transition: transform 0.3s ease; z-index: 9999; pointer-events: none; }
+        .save-toast.show { transform: translateX(-50%) translateY(0); }
+
+        .no-commission { text-align: center; padding: 2rem; color: rgba(255,255,255,0.4); font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages"></ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="transaction-wrapper">
+        <h1 class="transaction-title">Send Transaction</h1>
+         <form id="transactionForm">
+            <div class="t-card">
+                <h3>Commission Details</h3>
+                <div id="commissionInfo">
+                    <div class="no-commission">Select a commission first from client-home.html</div>
+                </div>
+            </div>
+
+            <div class="t-card">
+                <h3>Payment Details</h3>
+                <div class="form-group">
+                    <label>Commission ID *</label>
+                    <input type="number" name="commission_id" id="commissionId" placeholder="Enter commission ID" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount *</label>
+                    <input type="number" name="amount" id="paymentAmount" placeholder="e.g. 500" step="0.01" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method *</label>
+                    <select name="payment_method" id="paymentMethod" required>
+                        <option value="">Select method</option>
+                        <option value="gcash">GCash</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Account</label>
+                    <input type="text" name="payment_account" id="paymentAccount" placeholder="GCash number or PayPal email">
+                </div>
+                <div class="form-group">
+                    <label>Message (optional)</label>
+                    <textarea name="message" id="paymentMessage" placeholder="Thank you for your business!"></textarea>
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-cancel" onclick="window.location.href='client-home.html'">Cancel</button>
+                <button class="btn-send" id="sendBtn" onclick="sendTransaction()">Send Payment</button>
+            </div>
+        </form>
+    </div>
+
+        <!-- CLIENT INFO -->
+        <div class="t-card">
+            <h3>Commission From</h3>
+            <div id="commissionInfo">
+                <div class="no-commission">No active commission found. Go to <a href="index.html" style="color:#e3bfdb;">Pending Commissions</a> first.</div>
+            </div>
+        </div>
+
+        <!-- ARTWORK PREVIEW -->
+        <div class="t-card">
+            <h3>Artwork Preview (Watermarked)</h3>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:1rem;">Upload your completed artwork. A watermark will be added automatically before the client pays.</p>
+            <div class="watermark-zone" id="watermarkZone">
+                <div class="watermark-zone-icon">🖼️</div>
+                <p class="watermark-zone-text">Click or drag to upload your completed artwork</p>
+                <p class="watermark-zone-text" style="font-size:11px;">PNG, JPG up to 20MB</p>
+                <input type="file" id="artworkUpload" accept="image/*">
+            </div>
+            <div class="preview-container" id="previewContainer">
+                <img id="previewImg" src="" alt="Artwork Preview">
+                <div class="watermark-overlay">
+                    <span class="watermark-text">ARTICOM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYMENT -->
+        <div class="t-card">
+            <h3>Payment Request</h3>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="text" id="paymentAmount" placeholder="e.g. ₱500 or $50">
+            </div>
+            <div class="form-group">
+                <label>Payment Method</label>
+                <div class="payment-methods">
+                    <div class="payment-method-card" id="gcashCard" onclick="selectPayment('gcash')">
+                        <div class="payment-method-logo gcash-color">GCash</div>
+                        <div class="payment-method-name">GCash</div>
+                    </div>
+                    <div class="payment-method-card" id="paypalCard" onclick="selectPayment('paypal')">
+                        <div class="payment-method-logo paypal-color">PayPal</div>
+                        <div class="payment-method-name">PayPal</div>
+                    </div>
+                </div>
+                <div class="payment-details" id="paymentDetails">
+                    <div class="form-group" style="margin-top:1rem;margin-bottom:0;">
+                        <label id="paymentLabel">Account</label>
+                        <input type="text" id="paymentAccount" placeholder="">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Message to Client (optional)</label>
+                <input type="text" id="paymentMessage" placeholder="e.g. Thank you! Please complete payment to receive the full artwork.">
+            </div>
+        </div>
+
+        <div class="actions-row">
+            <button class="btn-cancel" onclick="window.location.href='index.html'">Cancel</button>
+            <button class="btn-send" id="sendBtn">Send Transaction Request</button>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">✅ Transaction request sent!</div>
+
+    <script src="script.js"></script>
+    <script>
+        var selectedPayment = '';
+
+        // Load active commission — will come from Firebase later
+        var pending = JSON.parse(localStorage.getItem('articom-pending') || '[]');
+        var active = pending.filter(function(p) { return p.status === 'accepted' || p.status === 'pending'; });
+
+        if (active.length) {
+            var commission = active[0];
+            document.getElementById('commissionInfo').innerHTML =
+                '<div class="client-row">' +
+                    '<img src="img.jpg" class="client-avatar" alt="Client">' +
+                    '<div>' +
+                        '<p class="client-name">' + (commission.client || '@client') + '</p>' +
+                        '<p class="client-request">' + (commission.text || 'No details') + '</p>' +
+                    '</div>' +
+                    '<span class="status-badge status-pending" style="margin-left:auto;">⏳ Pending</span>' +
+                '</div>';
+        }
+
+        document.getElementById('artworkUpload').addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+                document.getElementById('watermarkZone').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function selectPayment(method) {
+            selectedPayment = method;
+            document.getElementById('gcashCard').classList.toggle('selected', method === 'gcash');
+            document.getElementById('paypalCard').classList.toggle('selected', method === 'paypal');
+            document.getElementById('paymentDetails').classList.add('show');
+            document.getElementById('paymentLabel').textContent = method === 'gcash' ? 'GCash Number' : 'PayPal Email';
+            document.getElementById('paymentAccount').placeholder = method === 'gcash' ? 'e.g. 09XX XXX XXXX' : 'e.g. yourname@email.com';
+        }
+
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            var amount = document.getElementById('paymentAmount').value.trim();
+            var previewShowing = document.getElementById('previewContainer').style.display !== 'none';
+
+            if (!previewShowing) { alert('Please upload your completed artwork first.'); return; }
+            if (!amount) { alert('Please enter the payment amount.'); return; }
+            if (!selectedPayment) { alert('Please select a payment method.'); return; }
+
+            var transactions = JSON.parse(localStorage.getItem('articom-transactions') || '[]');
+            transactions.push({
+                id: Date.now(),
+                artist: 'Me',
+                client: active.length ? (active[0].client || '@client') : '@client',
+                amount: amount,
+                method: selectedPayment,
+                account: document.getElementById('paymentAccount').value,
+                message: document.getElementById('paymentMessage').value,
+                status: 'awaiting_payment',
+                time: new Date().toLocaleString()
+            });
+           const user = JSON.parse(localStorage.getItem('articom-user') || '{}');
+fetch('/api/transaction', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        client_id: user.id,
+        amount: amount,
+        payment_method: method,
+        description: description
+    })
+}).then(r => r.json()).then(data => {
+    if(data.success) console.log('Transaction saved!');
+});
+            var toast = document.getElementById('saveToast');
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+                window.location.href = 'index.html';
+            }, 2000);
+        });
+    </script>
+     <script>
+        async function sendTransaction() {
+            const form = document.getElementById('transactionForm');
+            const formData = new FormData(form);
+            
+            const btn = document.getElementById('sendBtn');
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('../../php/send_transaction.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.redirected) {
+                    showToast();
+                    setTimeout(() => {
+                        window.location.href = response.url;
+                    }, 1500);
+                } else {
+                    const error = await response.text();
+                    alert('Failed: ' + error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.textContent = 'Send Payment';
+                btn.disabled = false;
+            }
+        }
+
+        function showToast() {
+            document.getElementById('saveToast').classList.add('show');
+            setTimeout(() => document.getElementById('saveToast').classList.remove('show'), 2000);
+        }
+
+        // LOGIN CHECK
+        window.onload = function() {
+            fetch('../../php/check_session.php')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.logged_in || data.role !== 'client') {
+                        window.location.href = '../../folder_a.vscode/index.html';
+                    }
+                });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Edit Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .edit-wrapper {
+            max-width: 680px;
+            margin: 60px auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .edit-page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+
+        .edit-card {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .edit-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6e3078;
+            flex-shrink: 0;
+        }
+
+        .avatar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-btn {
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover { background: #8b4ea6; }
+
+        .remove-btn {
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            color: white;
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #8b4ea6;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-group select option {
+            background: #272222;
+        }
+
+        .char-count {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .tags-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            min-height: 44px;
+            cursor: text;
+        }
+
+        .tags-input-wrapper:focus-within {
+            border-color: #8b4ea6;
+        }
+
+        .tag-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #6e3078;
+            color: white;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .tag-pill button {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .tag-pill button:hover { color: white; }
+
+        .tags-input-wrapper input {
+            flex: 1;
+            min-width: 80px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        .social-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-icon {
+            font-size: 18px;
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .banner-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6e3078, #3a1a40);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            cursor: pointer;
+            border: 2px dashed rgba(255,255,255,0.15);
+            transition: border-color 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .banner-preview:hover { border-color: rgba(255,255,255,0.4); }
+
+        .banner-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-save {
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #8b4ea6;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            color: white;
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .save-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #4caf50;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .save-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Mail">🔔</button>
+                <div class="big-panel">
+                    <input type="text" placeholder="No new mails.." class="msg-search">
+                </div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Amir Gregorio"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Amir Gregorio</span></li>
+                        <li data-name="Slaka Buenchas"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Slaka Buenchas</span></li>
+                        <li data-name="Wayne Talagod"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Wayne Talagod</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel" id="profilePanel">
+                    <div style="padding: 16px;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600; font-size:14px; margin:0;">My Account</p>
+                                <p style="font-size:12px; opacity:0.6; margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%; padding:9px; background:#6e3078; color:white; border:none; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%; padding:9px; background:transparent; color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:13px; cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="edit-wrapper">
+        <h1 class="edit-page-title">Edit Profile</h1>
+
+        <!-- BANNER -->
+        <div class="edit-card">
+            <h3>Profile Banner</h3>
+            <div class="banner-preview" id="bannerPreview" onclick="document.getElementById('bannerInput').click()">
+                <span id="bannerPlaceholder">Click to upload a banner image</span>
+                <img id="bannerImg" src="" alt="" style="display:none;">
+            </div>
+            <input type="file" id="bannerInput" accept="image/*" style="display:none;">
+        </div>
+
+        <!-- AVATAR + NAME -->
+        <div class="edit-card">
+            <h3>Avatar & Display Name</h3>
+            <div class="avatar-row">
+                <img src="img.jpg" id="editAvatar" class="avatar-preview" alt="Profile picture">
+                <div class="avatar-actions">
+                    <button class="upload-btn" onclick="document.getElementById('avatarInput').click()">Upload Photo</button>
+                    <button class="remove-btn" id="removeAvatarBtn">Remove Photo</button>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+                </div>
+            </div>
+            <div style="margin-top: 1.2rem;">
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="displayName" placeholder="e.g. Loish" maxlength="40">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="@yourhandle" maxlength="30">
+                </div>
+            </div>
+        </div>
+
+        <!-- BIO -->
+        <div class="edit-card">
+            <h3>About You</h3>
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea id="bio" placeholder="Tell people about yourself and your art..." maxlength="200"></textarea>
+                <div class="char-count"><span id="bioCount">0</span> / 200</div>
+            </div>
+            <div class="form-group">
+                <label>Art Style / Category</label>
+                <select id="artCategory">
+                    <option value="">Select a category</option>
+                    <option>Illustrations</option>
+                    <option>3D Models</option>
+                    <option>Animation</option>
+                    <option>Stickers</option>
+                    <option>Character Design</option>
+                    <option>Concept Art</option>
+                    <option>Fan Art</option>
+                    <option>Photography</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tags <span style="opacity:0.4; font-size:11px; text-transform:none; letter-spacing:0;">(press Enter to add)</span></label>
+                <div class="tags-input-wrapper" id="tagsWrapper">
+                    <input type="text" id="tagInput" placeholder="e.g. digital art">
+                </div>
+            </div>
+        </div>
+
+        <!-- SOCIAL LINKS -->
+        <div class="edit-card">
+            <h3>Social Links</h3>
+            <div class="form-group">
+                <div class="social-row">
+                    <span class="social-icon">🐦</span>
+                    <input type="url" id="twitter" placeholder="https://twitter.com/yourhandle">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="social-row">
+                    <span class="social-icon">📸</span>
+                    <input type="url" id="instagram" placeholder="https://instagram.com/yourhandle">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="social-row">
+                    <span class="social-icon">🎨</span>
+                    <input type="url" id="artstation" placeholder="https://artstation.com/yourname">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="social-row">
+                    <span class="social-icon">🌐</span>
+                    <input type="url" id="website" placeholder="https://yourwebsite.com">
+                </div>
+            </div>
+        </div>
+
+        <!-- SAVE / CANCEL -->
+        <div class="actions-row">
+            <button class="btn-cancel" onclick="window.location.href='index.html'">Cancel</button>
+            <button class="btn-save" id="saveBtn">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">✅ Profile saved!</div>
+
+    <script src="script.js"></script>
+    <script>
+        const tags = [];
+
+        // LOAD saved data from localStorage
+        window.addEventListener('load', function () {
+            const saved = JSON.parse(localStorage.getItem('articom-profile') || '{}');
+
+            if (saved.displayName) document.getElementById('displayName').value = saved.displayName;
+            if (saved.username) document.getElementById('username').value = saved.username;
+            if (saved.bio) {
+                document.getElementById('bio').value = saved.bio;
+                document.getElementById('bioCount').textContent = saved.bio.length;
+            }
+            if (saved.artCategory) document.getElementById('artCategory').value = saved.artCategory;
+            if (saved.twitter) document.getElementById('twitter').value = saved.twitter;
+            if (saved.instagram) document.getElementById('instagram').value = saved.instagram;
+            if (saved.artstation) document.getElementById('artstation').value = saved.artstation;
+            if (saved.website) document.getElementById('website').value = saved.website;
+            if (saved.avatar) document.getElementById('editAvatar').src = saved.avatar;
+            if (saved.banner) {
+                document.getElementById('bannerImg').src = saved.banner;
+                document.getElementById('bannerImg').style.display = 'block';
+                document.getElementById('bannerPlaceholder').style.display = 'none';
+            }
+            if (saved.tags) {
+                saved.tags.forEach(t => tags.push(t));
+                renderTags();
+            }
+        });
+
+        // AVATAR UPLOAD
+        document.getElementById('avatarInput').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => document.getElementById('editAvatar').src = e.target.result;
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // REMOVE AVATAR
+        document.getElementById('removeAvatarBtn').addEventListener('click', function () {
+            document.getElementById('editAvatar').src = 'img.jpg';
+        });
+
+        // BANNER UPLOAD
+        document.getElementById('bannerInput').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('bannerImg').src = e.target.result;
+                    document.getElementById('bannerImg').style.display = 'block';
+                    document.getElementById('bannerPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // BIO CHAR COUNT
+        document.getElementById('bio').addEventListener('input', function () {
+            document.getElementById('bioCount').textContent = this.value.length;
+        });
+
+        // TAGS
+        const tagInput = document.getElementById('tagInput');
+        const tagsWrapper = document.getElementById('tagsWrapper');
+
+        tagsWrapper.addEventListener('click', () => tagInput.focus());
+
+        tagInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                e.preventDefault();
+                const val = this.value.trim();
+                if (!tags.includes(val) && tags.length < 8) {
+                    tags.push(val);
+                    renderTags();
+                }
+                this.value = '';
+            }
+            if (e.key === 'Backspace' && !this.value && tags.length) {
+                tags.pop();
+                renderTags();
+            }
+        });
+
+        function renderTags() {
+            tagsWrapper.querySelectorAll('.tag-pill').forEach(p => p.remove());
+            tags.forEach((tag, i) => {
+                const pill = document.createElement('span');
+                pill.className = 'tag-pill';
+                pill.innerHTML = `${tag}<button type="button" data-i="${i}">&times;</button>`;
+                pill.querySelector('button').addEventListener('click', () => {
+                    tags.splice(i, 1);
+                    renderTags();
+                });
+                tagsWrapper.insertBefore(pill, tagInput);
+            });
+        }
+
+        // SAVE to localStorage
+        document.getElementById('saveBtn').addEventListener('click', function () {
+            const profile = {
+                displayName: document.getElementById('displayName').value,
+                username: document.getElementById('username').value,
+                bio: document.getElementById('bio').value,
+                artCategory: document.getElementById('artCategory').value,
+                twitter: document.getElementById('twitter').value,
+                instagram: document.getElementById('instagram').value,
+                artstation: document.getElementById('artstation').value,
+                website: document.getElementById('website').value,
+                avatar: document.getElementById('editAvatar').src,
+                banner: document.getElementById('bannerImg').src,
+                tags: [...tags]
+            };
+const user = JSON.parse(localStorage.getItem('articom-user') || '{}');
+fetch('/api/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: user.id, ...profile })
+}).then(() => {
+    // keep localStorage as cache too
+    localStorage.setItem('articom-profile', JSON.stringify(profile));
+});
+
+            const toast = document.getElementById('saveToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    </script>
+</body>
+</html>

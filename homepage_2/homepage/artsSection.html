@@ -1,0 +1,83 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Services</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+              </a>
+        <div class="header-buttons">
+
+    <!-- MAIL -->
+    <div class="dropdown-container mail-container">
+        <button class="header-btn mail-btn" title="Mail">🔔</button>
+        <div class="big-panel">
+            <input type="text" placeholder="No new mails.." class="msg-search">
+        </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="dropdown-container message-container">
+        <button class="header-btn message-btn" id="msgBtn" title="Messages">💬</button>
+
+        <div class="big-panel" id="msgPanel">
+
+            <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+
+            <ul id="Messages">
+                <li data-name="Beeple">
+                    <img src="https://i.pravatar.cc/40?img=11">
+                    <span class="name">Beeple</span>
+                </li>
+
+                <li data-name="Loish">
+                    <img src="https://i.pravatar.cc/40?img=12">
+                    <span class="name">Loish</span>
+                </li>
+
+                <li data-name="Ross Tran">
+                    <img src="https://i.pravatar.cc/40?img=13">
+                    <span class="name">Ross Tran</span>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="dropdown-container">
+        <button class="header-btn user-btn" id="openProfilePage" title="Profile">👤</button>
+
+        <div class="big-panel" id="profilePanel">
+            <p><strong>My Profile</strong></p>
+
+            <img src="img.jpg" id="profileImage" width="80" style="border-radius:50%;">
+
+            <input type="file" id="fileInput" accept="image/*">
+
+            <button id="openProfilePageBtn" class="profile-page-btn">
+                Open Profile Page
+            </button>
+        </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="dropdown-container">
+        <button class="header-btn settings-btn" title="Settings">⚙️</button>
+
+        <div class="dropdown-panel">
+            <ul id="Settings">
+               
+            </ul>
+        </div>
+    </div>
+
+</div>
+        </div>
+    </nav>

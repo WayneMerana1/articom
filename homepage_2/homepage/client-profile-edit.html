@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Edit Client Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .edit-wrapper {
+            max-width: 680px;
+            margin: 60px auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .edit-page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+
+        .edit-card {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .edit-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6e3078;
+            flex-shrink: 0;
+        }
+
+        .avatar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-btn {
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover { background: #8b4ea6; }
+
+        .remove-btn {
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover { color: white; border-color: rgba(255,255,255,0.4); }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #272222;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #8b4ea6;
+        }
+
+        .form-group select option { background: #272222; }
+
+        .banner-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6e3078, #3a1a40);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            cursor: pointer;
+            border: 2px dashed rgba(255,255,255,0.15);
+            transition: border-color 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .banner-preview:hover { border-color: rgba(255,255,255,0.4); }
+
+        .banner-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        .genre-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .genre-pill {
+            background: rgba(110, 48, 120, 0.3);
+            border: 1px solid rgba(227, 191, 219, 0.3);
+            color: #e3bfdb;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .genre-pill.selected {
+            background: #6e3078;
+            border-color: #e3bfdb;
+            color: white;
+        }
+
+        .genre-pill:hover { background: #6e3078; color: white; }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-save {
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover { background: #8b4ea6; transform: translateY(-2px); }
+
+        .btn-cancel {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover { color: white; border-color: rgba(255,255,255,0.5); }
+
+        .save-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #4caf50;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .save-toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="client-home.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Beeple"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Beeple</span></li>
+                        <li data-name="Loish"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Loish</span></li>
+                        <li data-name="Ross Tran"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Ross Tran</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Client</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='client-profile-view.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="edit-wrapper">
+        <h1 class="edit-page-title">Edit Profile</h1>
+
+        <!-- BANNER -->
+        <div class="edit-card">
+            <h3>Profile Banner</h3>
+            <div class="banner-preview" id="bannerPreview" onclick="document.getElementById('bannerInput').click()">
+                <span id="bannerPlaceholder">Click to upload a banner image</span>
+                <img id="bannerImg" src="" alt="" style="display:none;">
+            </div>
+            <input type="file" id="bannerInput" accept="image/*" style="display:none;">
+        </div>
+
+        <!-- AVATAR + USERNAME -->
+        <div class="edit-card">
+            <h3>Avatar & Username</h3>
+            <div class="avatar-row">
+                <img src="img.jpg" id="editAvatar" class="avatar-preview" alt="Profile picture">
+                <div class="avatar-actions">
+                    <button class="upload-btn" onclick="document.getElementById('avatarInput').click()">Upload Photo</button>
+                    <button class="remove-btn" id="removeAvatarBtn">Remove Photo</button>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+                </div>
+            </div>
+            <div style="margin-top:1.2rem;">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="@yourname" maxlength="30">
+                </div>
+            </div>
+        </div>
+
+        <!-- ART PREFERENCES -->
+        <div class="edit-card">
+            <h3>Art Preferences</h3>
+            <p style="font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:1rem;">Select the art styles you're interested in.</p>
+            <div class="genre-grid" id="genreGrid">
+                <span class="genre-pill" data-genre="Illustrations">Illustrations</span>
+                <span class="genre-pill" data-genre="3D Models">3D Models</span>
+                <span class="genre-pill" data-genre="Animation">Animation</span>
+                <span class="genre-pill" data-genre="Stickers">Stickers</span>
+                <span class="genre-pill" data-genre="Character Design">Character Design</span>
+                <span class="genre-pill" data-genre="Concept Art">Concept Art</span>
+                <span class="genre-pill" data-genre="Fan Art">Fan Art</span>
+                <span class="genre-pill" data-genre="Photography">Photography</span>
+                <span class="genre-pill" data-genre="Comic Art">Comic Art</span>
+                <span class="genre-pill" data-genre="Logo Design">Logo Design</span>
+            </div>
+        </div>
+
+        <!-- SAVE / CANCEL -->
+        <div class="actions-row">
+            <button class="btn-cancel" onclick="window.location.href='client-home.html'">Cancel</button>
+            <button class="btn-save" id="saveBtn">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">✅ Profile saved!</div>
+
+    <script src="script.js"></script>
+    <script>
+        const selectedGenres = [];
+
+        // LOAD saved data
+        window.addEventListener('load', function () {
+            const saved = JSON.parse(localStorage.getItem('articom-client-profile') || '{}');
+            if (saved.username) document.getElementById('username').value = saved.username;
+            if (saved.avatar) document.getElementById('editAvatar').src = saved.avatar;
+            if (saved.banner) {
+                document.getElementById('bannerImg').src = saved.banner;
+                document.getElementById('bannerImg').style.display = 'block';
+                document.getElementById('bannerPlaceholder').style.display = 'none';
+            }
+            if (saved.genres) {
+                saved.genres.forEach(g => {
+                    selectedGenres.push(g);
+                    document.querySelectorAll('.genre-pill').forEach(p => {
+                        if (p.getAttribute('data-genre') === g) p.classList.add('selected');
+                    });
+                });
+            }
+        });
+
+        // GENRE TOGGLE
+        document.querySelectorAll('.genre-pill').forEach(pill => {
+            pill.addEventListener('click', function () {
+                const genre = this.getAttribute('data-genre');
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    const i = selectedGenres.indexOf(genre);
+                    if (i > -1) selectedGenres.splice(i, 1);
+                } else {
+                    this.classList.add('selected');
+                    selectedGenres.push(genre);
+                }
+            });
+        });
+
+        // AVATAR UPLOAD
+        document.getElementById('avatarInput').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => document.getElementById('editAvatar').src = e.target.result;
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('removeAvatarBtn').addEventListener('click', function () {
+            document.getElementById('editAvatar').src = 'img.jpg';
+        });
+
+        // BANNER UPLOAD
+        document.getElementById('bannerInput').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('bannerImg').src = e.target.result;
+                    document.getElementById('bannerImg').style.display = 'block';
+                    document.getElementById('bannerPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // SAVE
+        document.getElementById('saveBtn').addEventListener('click', function () {
+            const profile = {
+                username: document.getElementById('username').value,
+                avatar: document.getElementById('editAvatar').src,
+                banner: document.getElementById('bannerImg').src,
+                genres: [...selectedGenres]
+            };
+            localStorage.setItem('articom-client-profile', JSON.stringify(profile));
+            const toast = document.getElementById('saveToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    </script>
+</body>
+</html>

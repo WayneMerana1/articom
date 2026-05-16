@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Welcome</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .landing-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .about-header-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .about-header-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .login-header-btn {
+            background: #e3bfdb;
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .login-header-btn:hover {
+            background: #d4a8cc;
+            transform: translateY(-2px);
+        }
+
+        .landing-hero {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .landing-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(227, 191, 219, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(227, 191, 219, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .landing-title {
+            font-size: clamp(3.5rem, 9vw, 7rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e3bfdb, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .landing-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: rgba(255,255,255,0.85);
+            max-width: 580px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .landing-get-started {
+            background: #e3bfdb;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(227, 191, 219, 0.4);
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+
+        .landing-get-started:hover {
+            background: #d4a8cc;
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(227, 191, 219, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="landing.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+
+        <div class="landing-nav-links">
+            <a href="about.html" class="about-header-btn">About Us</a>
+        <a href="/folder_a.vscode/index.html" class="login-header-btn">Login</a>
+        </div>
+    </nav>
+
+    <main class="landing-hero">
+        <h1 class="landing-title">CREATIVES<br>AT WORK</h1>
+        <p class="landing-subtitle">
+            Where artists meet opportunity. Showcase your craft, connect with fellow creatives, and turn your passion into your profession.
+        </p>
+      <a href="/folder_a.vscode/index.html" class="landing-get-started">Get Started</a>
+    </main>
+
+</body>
+</html>

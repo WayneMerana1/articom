@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Find Customers</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .fc-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        .fc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .fc-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .filter-pill {
+            background: rgba(110,48,120,0.3);
+            border: 1px solid rgba(227,191,219,0.25);
+            color: #e3bfdb;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: #6e3078;
+            border-color: #e3bfdb;
+            color: white;
+        }
+
+        .post-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .post-card {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: border-color 0.2s;
+        }
+
+        .post-card:hover { border-color: rgba(227,191,219,0.2); }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .post-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(227,191,219,0.3); flex-shrink: 0; }
+        .post-meta { flex: 1; }
+        .post-username { font-size: 14px; font-weight: 700; color: white; margin: 0; }
+        .post-time { font-size: 12px; color: rgba(255,255,255,0.4); margin: 2px 0 0; }
+
+        .post-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+        .post-category-badge { background: #6e3078; color: white; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+
+        .post-report-btn { background: rgba(220,50,50,0.1); color: #ff6b6b; border: 1px solid rgba(220,50,50,0.2); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .post-report-btn:hover { background: rgba(220,50,50,0.25); }
+
+        .post-text { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.7; margin-bottom: 1rem; }
+
+        .post-images { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+        .post-images img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+        .post-images img:hover { transform: scale(1.05); }
+
+        .post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+        .post-tag { background: rgba(110,48,120,0.3); border: 1px solid rgba(227,191,219,0.2); color: #e3bfdb; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+
+        .post-budget { font-size: 13px; color: #e3bfdb; font-weight: 600; margin-bottom: 1rem; }
+
+        .comments-section { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; margin-top: 0.5rem; }
+        .comments-title { font-size: 12px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.8rem; }
+
+        .comment-item { display: flex; gap: 10px; margin-bottom: 0.8rem; align-items: flex-start; }
+        .comment-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+        .comment-bubble { background: #272222; border-radius: 12px; padding: 8px 12px; flex: 1; }
+        .comment-name { font-size: 12px; font-weight: 700; color: #e3bfdb; margin-bottom: 3px; }
+        .comment-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+        .comment-input-row { display: flex; gap: 8px; margin-top: 0.8rem; align-items: center; }
+        .comment-input { flex: 1; padding: 8px 14px; background: #272222; border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: white; font-size: 13px; font-family: inherit; outline: none; }
+        .comment-input:focus { border-color: #8b4ea6; }
+        .comment-input::placeholder { color: rgba(255,255,255,0.3); }
+        .comment-send-btn { width: 36px; height: 36px; border-radius: 50%; background: #6e3078; color: white; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+        .comment-send-btn:hover { background: #8b4ea6; }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255,255,255,0.4);
+            background: #3a3535;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state-text { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
+        .empty-state-sub { font-size: 13px; }
+
+        .report-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center; }
+        .report-modal.show { display: flex; }
+        .report-box { background: #3a3535; border-radius: 16px; padding: 2rem; max-width: 380px; width: 90%; border: 1px solid rgba(255,255,255,0.1); }
+        .report-box h3 { color: #ff6b6b; font-size: 1rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .report-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; }
+        .report-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,0.04); border-radius: 8px; cursor: pointer; color: white; font-size: 13px; }
+        .report-option:hover { background: rgba(255,255,255,0.1); }
+        .report-option input { accent-color: #6e3078; }
+        .report-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .report-submit { background: #c0392b; color: white; border: none; padding: 9px 24px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .report-cancel { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 9px 24px; border-radius: 50px; font-size: 13px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages"></ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="fc-wrapper">
+        <div class="fc-top">
+            <h1 class="fc-title">Find Customers</h1>
+        </div>
+
+        <div class="filter-row">
+            <span class="filter-pill active" data-filter="All">All</span>
+            <span class="filter-pill" data-filter="Illustrations">Illustrations</span>
+            <span class="filter-pill" data-filter="3D Models">3D Models</span>
+            <span class="filter-pill" data-filter="Animation">Animation</span>
+            <span class="filter-pill" data-filter="Stickers">Stickers</span>
+            <span class="filter-pill" data-filter="Character Design">Character Design</span>
+            <span class="filter-pill" data-filter="Concept Art">Concept Art</span>
+        </div>
+
+        <div class="post-list" id="postList">
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p class="empty-state-text">No requests yet</p>
+                <p class="empty-state-sub">Client requests will appear here once connected to the database.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORT MODAL -->
+    <div class="report-modal" id="reportModal">
+        <div class="report-box">
+            <h3>⚑ Report Post</h3>
+            <div class="report-options">
+                <label class="report-option"><input type="radio" name="reportReason" value="Spam"> Spam</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Scam or fraud"> Scam or fraud</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Inappropriate content"> Inappropriate content</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Fake request"> Fake request</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Other"> Other</label>
+            </div>
+            <div class="report-actions">
+                <button class="report-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="report-submit" onclick="submitReport()">Submit Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        var activeFilter = 'All';
+        var currentReportPost = null;
+
+        // Posts will be loaded from Firebase
+        // renderPosts(posts) will be called after Firebase loads data
+     // Load real commissions from database
+fetch('/api/commissions')
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    var mapped = rows.map(function(c) {
+      return {
+        id:       c.id,
+        username: '@' + (c.client_name || 'client').toLowerCase().replace(' ', ''),
+        avatar:   'https://i.pravatar.cc/44?u=' + c.client_id,
+        text:     c.description,
+        category: c.title || 'General',
+        budget:   c.budget || 'Negotiable',
+        tags:     [],
+        images:   [],
+        time:     c.created || 'Recently',
+        comments: []
+      };
+    });
+    renderPosts(mapped);
+  });
+
+function renderPosts(posts) {
+            var list = document.getElementById('postList');
+            list.innerHTML = '';
+
+            var data = posts || [];
+            var filtered = activeFilter === 'All' ? data : data.filter(function(p) { return p.category === activeFilter; });
+
+            if (!filtered.length) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p class="empty-state-text">No requests found</p><p class="empty-state-sub">Try a different filter or check back later.</p></div>';
+                return;
+            }
+
+            filtered.forEach(function(post) {
+                var card = document.createElement('div');
+                card.className = 'post-card';
+
+                var imagesHTML = post.images && post.images.length
+                    ? '<div class="post-images">' + post.images.map(function(src) { return '<img src="' + src + '" alt="ref" style="border-radius:8px;object-fit:cover;">'; }).join('') + '</div>'
+                    : '';
+
+                var tagsHTML = post.tags && post.tags.length
+                    ? '<div class="post-tags">' + post.tags.map(function(t) { return '<span class="post-tag">#' + t + '</span>'; }).join('') + '</div>'
+                    : '';
+
+                var commentsHTML = (post.comments || []).map(function(c) {
+                    return '<div class="comment-item"><img src="' + c.avatar + '" class="comment-avatar" alt="' + c.name + '" style="border-radius:50%;object-fit:cover;"><div class="comment-bubble"><div class="comment-name">' + c.name + '</div><div class="comment-text">' + c.text + '</div></div></div>';
+                }).join('');
+
+                card.innerHTML =
+                    '<div class="post-header">' +
+                        '<img src="' + post.avatar + '" class="post-avatar" alt="' + post.username + '" style="border-radius:50%;object-fit:cover;">' +
+                        '<div class="post-meta"><p class="post-username">' + post.username + '</p><p class="post-time">' + post.time + '</p></div>' +
+                        '<div class="post-header-right">' +
+                            '<span class="post-category-badge">' + post.category + '</span>' +
+                            '<button class="post-report-btn" onclick="openReportModal(\'' + post.id + '\')">⚑ Report</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<p class="post-text">' + post.text + '</p>' +
+                    imagesHTML + tagsHTML +
+                    '<p class="post-budget">💰 Budget: ' + post.budget + '</p>' +
+                    '<div class="comments-section">' +
+                        '<p class="comments-title">' + (post.comments || []).length + ' Comment' + ((post.comments || []).length !== 1 ? 's' : '') + '</p>' +
+                        '<div class="comments-list" id="comments-' + post.id + '">' + commentsHTML + '</div>' +
+                        '<div class="comment-input-row">' +
+                            '<input type="text" class="comment-input" id="input-' + post.id + '" placeholder="Write a comment...">' +
+                            '<button class="comment-send-btn" onclick="addComment(\'' + post.id + '\')">➤</button>' +
+                        '</div>' +
+                    '</div>';
+
+                card.querySelector('#input-' + post.id).addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') addComment(post.id);
+                });
+
+                list.appendChild(card);
+            });
+        }
+
+        function addComment(postId) {
+            var input = document.getElementById('input-' + postId);
+            var text = input.value.trim();
+            if (!text) return;
+            // Will save to Firebase
+            var artistProfile = JSON.parse(localStorage.getItem('articom-profile') || '{}');
+            var comment = { name: artistProfile.displayName || 'Artist', avatar: artistProfile.avatar || 'img.jpg', text: text };
+            var commentsList = document.getElementById('comments-' + postId);
+            var el = document.createElement('div');
+            el.className = 'comment-item';
+            el.innerHTML = '<img src="' + comment.avatar + '" class="comment-avatar" alt="' + comment.name + '" style="border-radius:50%;object-fit:cover;width:32px;height:32px;"><div class="comment-bubble"><div class="comment-name">' + comment.name + '</div><div class="comment-text">' + comment.text + '</div></div>';
+            commentsList.appendChild(el);
+            input.value = '';
+        }
+
+        function openReportModal(postId) {
+            currentReportPost = postId;
+            document.getElementById('reportModal').classList.add('show');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('show');
+            currentReportPost = null;
+        }
+
+        function submitReport() {
+            var selected = document.querySelector('input[name="reportReason"]:checked');
+            if (!selected) { alert('Please select a reason.'); return; }
+            var reports = JSON.parse(localStorage.getItem('articom-reports') || '[]');
+            reports.push({ id: Date.now(), type: 'post', postId: currentReportPost, reason: selected.value, time: new Date().toLocaleString() });
+            localStorage.setItem('articom-reports', JSON.stringify(reports));
+            closeReportModal();
+            var toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;z-index:99999;';
+            toast.textContent = 'Report submitted.';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 3000);
+        }
+
+        document.querySelectorAll('.filter-pill').forEach(function(pill) {
+            pill.addEventListener( 'click', function() {
+                document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+                this.classList.add('active');
+                activeFilter = this.getAttribute('data-filter');
+                renderPosts();
+            });
+        });
+
+        // ── LOAD REAL COMMISSIONS FROM DATABASE ──────────────────────
+fetch('/api/commissions')
+  .then(function(r){ return r.json(); })
+  .then(function(posts){
+    if(posts.length > 0){
+      console.log('✅ Real posts from DB:', posts);
+      // posts from DB are available here
+      // existing renderPosts() still works
+    }
+  });
+    </script>
+</body>
+</html>

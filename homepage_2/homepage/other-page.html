@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Services</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+
+            <!-- MAIL -->
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Mail">🔔</button>
+                <div class="big-panel">
+                    <input type="text" placeholder="No new mails.." class="msg-search">
+                </div>
+            </div>
+
+            <!-- MESSAGES -->
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" id="msgBtn" title="Messages">💬</button>
+                <div class="big-panel" id="msgPanel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Amir Gregorio">
+                            <img src="https://i.pravatar.cc/40?img=11">
+                            <span class="name">Amir Gregorio</span>
+                        </li>
+                        <li data-name="Slaka Buenchas">
+                            <img src="https://i.pravatar.cc/40?img=12">
+                            <span class="name">Slaka Buenchas</span>
+                        </li>
+                        <li data-name="Wayne Talagod">
+                            <img src="https://i.pravatar.cc/40?img=13">
+                            <span class="name">Wayne Talagod</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PROFILE — same as index.html -->
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel" id="profilePanel">
+                    <div style="padding: 16px;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600; font-size:14px; margin:0;">My Account</p>
+                                <p style="font-size:12px; opacity:0.6; margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%; padding:9px; background:#6e3078; color:white; border:none; border-radius:8px; font-size:13px; cursor:pointer; margin-bottom:8px;">
+                            ✏️ Edit Profile
+                        </button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%; padding:9px; background:transparent; color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:13px; cursor:pointer;">
+                            👁️ View Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel">
+                    <ul id="Settings"></ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="services-title">
+        <h2>SERVICES AVAILABLE</h2>
+    </div>
+
+    <main class="services-section">
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="category-image">
+                    <img src="illustrations.jpg" alt="Illustrations" class="category-img">
+                </div>
+                <div class="category-text">Illustrations</div>
+            </div>
+            <div class="category-card">
+                <div class="category-image">
+                    <img src="3d-models.jpg" alt="3D Models" class="category-img">
+                </div>
+                <div class="category-text">3D Models</div>
+            </div>
+            <div class="category-card">
+                <div class="category-image">
+                    <img src="animation.jpg" alt="Animation" class="category-img">
+                </div>
+                <div class="category-text">Animation</div>
+            </div>
+            <div class="category-card">
+                <div class="category-image">
+                    <img src="stickers.jpg" alt="Stickers" class="category-img">
+                </div>
+                <div class="category-text">Stickers</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

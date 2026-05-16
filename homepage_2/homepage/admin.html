@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        .admin-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .admin-badge {
+            background: rgba(220,50,50,0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220,50,50,0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 140px;
+            background: #3a3535;
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+
+        .stat-number { font-size: 2rem; font-weight: 900; color: #e3bfdb; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.8px; }
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .admin-tab {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-family: inherit;
+        }
+
+        .admin-tab:hover { color: white; }
+        .admin-tab.active { color: #e3bfdb; border-bottom-color: #e3bfdb; }
+
+        .tab-content { display: none; }
+        .tab-content.show { display: block; }
+
+        .report-card {
+            background: #3a3535;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .report-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(220,50,50,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .report-info { flex: 1; min-width: 200px; }
+        .report-reason { font-size: 14px; font-weight: 700; color: white; margin: 0 0 4px; }
+        .report-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin: 0 0 8px; }
+        .report-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .warn-btn { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3); padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .warn-btn:hover { background: rgba(255,193,7,0.3); }
+
+        .ban-btn { background: rgba(220,50,50,0.15); color: #ff6b6b; border: 1px solid rgba(220,50,50,0.3); padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .ban-btn:hover { background: rgba(220,50,50,0.3); }
+
+        .dismiss-btn { background: transparent; color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .dismiss-btn:hover { color: white; border-color: rgba(255,255,255,0.3); }
+
+        .users-table { width: 100%; border-collapse: collapse; }
+        .users-table th { text-align: left; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .users-table td { padding: 12px; font-size: 13px; color: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+        .users-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+        .user-status { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-active { background: rgba(76,175,80,0.15); color: #4caf50; }
+        .status-warned { background: rgba(255,193,7,0.15); color: #ffc107; }
+        .status-banned { background: rgba(220,50,50,0.15); color: #ff6b6b; }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            background: #3a3535;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .empty-state-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .empty-state-text { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
+
+        .confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .confirm-modal.show { display: flex; }
+        .confirm-box { background: #3a3535; border-radius: 16px; padding: 2rem 2.5rem; text-align: center; max-width: 360px; width: 90%; border: 1px solid rgba(255,255,255,0.1); }
+        .confirm-box p { color: white; font-size: 1rem; margin-bottom: 1.5rem; }
+        .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+        .confirm-yes { background: #c0392b; color: white; border: none; padding: 10px 28px; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .confirm-no { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 28px; border-radius: 50px; font-size: 14px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="admin.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <div class="admin-header-row">
+            <h1 class="admin-title">Admin Panel</h1>
+            <span class="admin-badge">🛡️ Admin</span>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="totalReports">0</div>
+                <div class="stat-label">Total Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalWarnings">0</div>
+                <div class="stat-label">Warnings Issued</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalBanned">0</div>
+                <div class="stat-label">Banned Accounts</div>
+            </div>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('reports', this)">Reports</button>
+            <button class="admin-tab" onclick="switchTab('users', this)">Users</button>
+            <button class="admin-tab" onclick="switchTab('transactions', this)">Transactions</button>
+        </div>
+
+        <!-- REPORTS TAB -->
+        <div class="tab-content show" id="tab-reports">
+            <div id="reportsList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">✅</div>
+                    <p class="empty-state-text">No reports yet</p>
+                    Reports from users and artists will appear here.
+                </div>
+            </div>
+        </div>
+
+        <!-- USERS TAB -->
+        <div class="tab-content" id="tab-users">
+            <div style="background:#3a3535;border-radius:12px;border:1px solid rgba(255,255,255,0.06);overflow:hidden;">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align:center;color:rgba(255,255,255,0.4);padding:2rem;">
+                                No users yet. Users will appear here once connected to the database.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS TAB -->
+        <div class="tab-content" id="tab-transactions">
+            <div id="transactionsList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💳</div>
+                    <p class="empty-state-text">No transactions yet</p>
+                    Transactions between artists and clients will appear here.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM MODAL -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-box">
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="confirm-actions">
+                <button class="confirm-yes" id="confirmYes">Yes</button>
+                <button class="confirm-no" onclick="closeConfirm()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        var warnings = parseInt(localStorage.getItem('admin-warnings') || '0');
+        var banned = parseInt(localStorage.getItem('admin-banned') || '0');
+
+        function loadStats() {
+            var reports = JSON.parse(localStorage.getItem('articom-reports') || '[]');
+            document.getElementById('totalReports').textContent = reports.length;
+            document.getElementById('totalWarnings').textContent = warnings;
+            document.getElementById('totalBanned').textContent = banned;
+            // totalUsers will come from Firebase
+            document.getElementById('totalUsers').textContent = '0';
+        }
+
+        function loadReports() {
+            var reports = JSON.parse(localStorage.getItem('articom-reports') || '[]');
+            var list = document.getElementById('reportsList');
+            list.innerHTML = '';
+
+            if (!reports.length) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p class="empty-state-text">No reports yet</p>Reports will appear here once users start submitting them.</div>';
+                return;
+            }
+
+            reports.forEach(function(report, i) {
+                var card = document.createElement('div');
+                card.className = 'report-card';
+                card.id = 'report-' + i;
+                card.innerHTML =
+                    '<div class="report-icon">⚑</div>' +
+                    '<div class="report-info">' +
+                        '<p class="report-reason">' + report.reason + '</p>' +
+                        '<p class="report-meta">Type: ' + report.type + ' · ' + report.time + '</p>' +
+                        '<div class="report-actions-row">' +
+                            '<button class="warn-btn" onclick="warnUser(' + i + ')">⚠️ Warn</button>' +
+                            '<button class="ban-btn" onclick="banUser(' + i + ')">🚫 Ban</button>' +
+                            '<button class="dismiss-btn" onclick="dismissReport(' + i + ')">Dismiss</button>' +
+                        '</div>' +
+                    '</div>';
+                list.appendChild(card);
+            });
+        }
+
+        function loadTransactions() {
+            var transactions = JSON.parse(localStorage.getItem('articom-transactions') || '[]');
+            var list = document.getElementById('transactionsList');
+            list.innerHTML = '';
+
+            if (!transactions.length) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💳</div><p class="empty-state-text">No transactions yet</p>Transactions will appear here once connected to the database.</div>';
+                return;
+            }
+
+            transactions.forEach(function(t) {
+                var card = document.createElement('div');
+                card.className = 'report-card';
+                card.innerHTML =
+                    '<div class="report-icon">💳</div>' +
+                    '<div class="report-info">' +
+                        '<p class="report-reason">' + t.artist + ' → ' + t.client + '</p>' +
+                        '<p class="report-meta">Amount: ' + t.amount + ' · ' + t.method + ' · ' + t.time + '</p>' +
+                        '<span class="user-status status-warned">' + t.status.replace('_', ' ') + '</span>' +
+                    '</div>';
+                list.appendChild(card);
+            });
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('show'); });
+            document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.getElementById('tab-' + tab).classList.add('show');
+            btn.classList.add('active');
+            if (tab === 'reports') loadReports();
+            if (tab === 'transactions') loadTransactions();
+        }
+
+        var confirmCallback = null;
+
+        function showConfirm(message, callback) {
+            document.getElementById('confirmMessage').textContent = message;
+            confirmCallback = callback;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+            confirmCallback = null;
+        }
+
+        document.getElementById('confirmYes').addEventListener('click', function() {
+            if (confirmCallback) confirmCallback();
+            closeConfirm();
+        });
+
+        function warnUser(i) {
+            showConfirm('Issue a warning for this report?', function() {
+                warnings++;
+                localStorage.setItem('admin-warnings', warnings);
+                loadStats();
+                showToast('⚠️ Warning issued.');
+            });
+        }
+
+        function banUser(i) {
+            showConfirm('Ban this user? This action is serious.', function() {
+                banned++;
+                localStorage.setItem('admin-banned', banned);
+                var el = document.getElementById('report-' + i);
+                if (el) el.remove();
+                loadStats();
+                showToast('🚫 User banned.');
+            });
+        }
+
+        function dismissReport(i) {
+            var reports = JSON.parse(localStorage.getItem('articom-reports') || '[]');
+            reports.splice(i, 1);
+            localStorage.setItem('articom-reports', JSON.stringify(reports));
+            loadReports();
+            loadStats();
+            showToast('Report dismissed.');
+        }
+
+        function showToast(msg) {
+            var toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;z-index:99999;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 3000);
+        }
+
+        loadStats();
+        loadReports();
+    </script>
+</body>
+</html>

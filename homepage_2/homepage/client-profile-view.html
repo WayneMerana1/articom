@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Client Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-banner {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #6e3078, #3a1a40);
+            background-size: cover;
+            background-position: center;
+            display: block;
+        }
+
+        .profile-header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #2f2f2f;
+            margin-top: -60px;
+            display: block;
+        }
+
+        .profile-info { margin-top: 1rem; }
+
+        .profile-username {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            margin: 0 0 4px;
+        }
+
+        .client-badge {
+            display: inline-block;
+            background: #6e3078;
+            color: white;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+
+        .preferences-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .genre-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .genre-tag {
+            background: rgba(110, 48, 120, 0.4);
+            border: 1px solid rgba(227, 191, 219, 0.3);
+            color: #e3bfdb;
+            font-size: 13px;
+            padding: 6px 16px;
+            border-radius: 50px;
+        }
+
+        .no-prefs {
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            margin-bottom: 2rem;
+        }
+
+        .profile-divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin: 1.5rem 0;
+        }
+
+        .edit-profile-btn {
+            display: inline-block;
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .edit-profile-btn:hover {
+            background: #8b4ea6;
+            transform: translateY(-2px);
+        }
+
+        .requests-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .requests-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-requests {
+            background: #3a3535;
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .empty-requests p { margin-bottom: 1rem; }
+
+        .post-request-btn {
+            background: #e3bfdb;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .post-request-btn:hover {
+            background: #d4a8cc;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="client-home.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages">
+                        <li data-name="Beeple"><img src="https://i.pravatar.cc/40?img=11"><span class="name">Beeple</span></li>
+                        <li data-name="Loish"><img src="https://i.pravatar.cc/40?img=12"><span class="name">Loish</span></li>
+                        <li data-name="Ross Tran"><img src="https://i.pravatar.cc/40?img=13"><span class="name">Ross Tran</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Client</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='client-profile-view.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BANNER -->
+    <div class="profile-banner" id="bannerSection"></div>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <img id="profileAvatar" src="img.jpg" class="profile-avatar" alt="Profile picture">
+        <div class="profile-info">
+            <h1 class="profile-username" id="profileUsername">@username</h1>
+            <span class="client-badge">Client</span>
+            <p class="preferences-title">Art Preferences</p>
+            <div class="genre-tags" id="genreTags"></div>
+            <a href="client-profile-edit.html" class="edit-profile-btn">✏️ Edit Profile</a>
+        </div>
+        <hr class="profile-divider">
+    </div>
+
+    <!-- ART REQUESTS -->
+    <div class="requests-section">
+        <h2 class="requests-title">My Art Requests</h2>
+        <div class="empty-requests">
+            <p>You haven't posted any art requests yet.</p>
+            <button class="post-request-btn" onclick="alert('Post a request — coming soon!')">+ Post a Request</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const saved = JSON.parse(localStorage.getItem('articom-client-profile') || '{}');
+
+            if (saved.avatar) {
+                document.getElementById('profileAvatar').src = saved.avatar;
+                document.getElementById('profileImage').src = saved.avatar;
+            }
+
+            if (saved.banner && saved.banner !== '') {
+                const banner = document.getElementById('bannerSection');
+                banner.style.backgroundImage = `url('${saved.banner}')`;
+            }
+
+            if (saved.username) {
+                const u = saved.username;
+                document.getElementById('profileUsername').textContent = u.startsWith('@') ? u : '@' + u;
+            }
+
+            const tagsContainer = document.getElementById('genreTags');
+            if (saved.genres && saved.genres.length) {
+                saved.genres.forEach(g => {
+                    const span = document.createElement('span');
+                    span.className = 'genre-tag';
+                    span.textContent = g;
+                    tagsContainer.appendChild(span);
+                });
+            } else {
+                tagsContainer.innerHTML = '<p class="no-prefs">No preferences set yet.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

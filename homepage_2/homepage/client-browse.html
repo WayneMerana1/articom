@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Browse Artworks</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .browse-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        .browse-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .browse-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .browse-search {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(227,191,219,0.4);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            width: 260px;
+            transition: all 0.2s;
+        }
+
+        .browse-search::placeholder { color: rgba(255,255,255,0.4); }
+        .browse-search:focus { border-color: #e3bfdb; }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .filter-pill {
+            background: rgba(110,48,120,0.3);
+            border: 1px solid rgba(227,191,219,0.25);
+            color: #e3bfdb;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: #6e3078;
+            border-color: #e3bfdb;
+            color: white;
+        }
+
+        .artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .artwork-card {
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background: #3a3535;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s ease;
+        }
+
+        .artwork-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+            border-color: rgba(227,191,219,0.3);
+        }
+
+        .artwork-img { width: 100%; height: 200px; object-fit: cover; display: block; border-radius: 0; }
+
+        .artwork-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0);
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .artwork-card:hover .artwork-overlay { background: rgba(0,0,0,0.4); }
+
+        .artwork-overlay-text {
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .artwork-card:hover .artwork-overlay-text { opacity: 1; }
+
+        .artwork-info { padding: 12px; }
+        .artwork-title { font-size: 14px; font-weight: 700; color: white; margin: 0 0 4px; }
+        .artwork-artist-name { font-size: 12px; color: #e3bfdb; }
+        .artwork-category { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: rgba(255,255,255,0.4);
+            grid-column: 1/-1;
+        }
+
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state-text { font-size: 15px; margin-bottom: 0.5rem; color: rgba(255,255,255,0.6); }
+        .empty-state-sub { font-size: 13px; }
+
+        /* MODAL */
+        .artwork-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 1.5rem; }
+        .artwork-modal.show { display: flex; }
+
+        .modal-content { background: #2f2f2f; border-radius: 20px; max-width: 950px; width: 100%; max-height: 90vh; overflow-y: auto; display: flex; border: 1px solid rgba(255,255,255,0.08); position: relative; }
+
+        .modal-image-side { flex: 1.3; min-width: 0; background: #1a1a1a; border-radius: 20px 0 0 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .modal-image-side img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0; min-height: 400px; }
+
+        .modal-info-side { width: 300px; flex-shrink: 0; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; }
+
+        .modal-top-row { display: flex; align-items: center; justify-content: space-between; }
+
+        .report-btn { display: flex; align-items: center; gap: 6px; background: rgba(220,50,50,0.15); color: #ff6b6b; border: 1px solid rgba(220,50,50,0.3); padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .report-btn:hover { background: rgba(220,50,50,0.3); }
+
+        .settings-icon-btn { background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.6); width: 32px; height: 32px; border-radius: 8px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .settings-icon-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        .modal-artwork-title { font-size: 1.2rem; font-weight: 900; color: white; margin: 0; line-height: 1.3; }
+        .modal-artwork-details { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; }
+        .modal-artwork-category { display: inline-block; background: #6e3078; color: white; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; margin-bottom: 4px; }
+
+        .modal-artist-row { display: flex; align-items: center; gap: 10px; }
+        .modal-artist-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #6e3078; flex-shrink: 0; cursor: pointer; }
+        .modal-artist-name { font-size: 13px; font-weight: 700; color: white; margin: 0; }
+        .modal-artist-handle { font-size: 11px; color: #e3bfdb; margin: 2px 0 0; }
+
+        .payment-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .payment-logos { display: flex; gap: 8px; flex-wrap: wrap; }
+        .payment-logo { background: white; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: transform 0.2s; }
+        .payment-logo:hover { transform: scale(1.05); }
+        .gcash-logo { color: #0073C8; }
+        .paypal-logo { color: #003087; }
+
+        .terms-box { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.6; border: 1px solid rgba(255,255,255,0.06); }
+        .terms-box strong { color: #e3bfdb; display: block; margin-bottom: 4px; font-size: 12px; }
+
+        .msg-artist-btn { width: 100%; padding: 11px; background: #6e3078; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; }
+        .msg-artist-btn:hover { background: #8b4ea6; transform: translateY(-2px); }
+
+        .modal-close { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10; }
+        .modal-close:hover { background: rgba(0,0,0,0.8); }
+
+        .report-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center; }
+        .report-modal.show { display: flex; }
+        .report-box { background: #3a3535; border-radius: 16px; padding: 2rem; max-width: 380px; width: 90%; border: 1px solid rgba(255,255,255,0.1); }
+        .report-box h3 { color: #ff6b6b; font-size: 1rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .report-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; }
+        .report-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,0.04); border-radius: 8px; cursor: pointer; color: white; font-size: 13px; }
+        .report-option:hover { background: rgba(255,255,255,0.1); }
+        .report-option input { accent-color: #6e3078; }
+        .report-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .report-submit { background: #c0392b; color: white; border: none; padding: 9px 24px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .report-cancel { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 9px 24px; border-radius: 50px; font-size: 13px; cursor: pointer; }
+
+        @media (max-width: 640px) {
+            .modal-content { flex-direction: column; }
+            .modal-image-side { border-radius: 20px 20px 0 0; }
+            .modal-info-side { width: auto; border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+            .modal-image-side img { min-height: 220px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="client-home.html" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages"></ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Client</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='client-profile-view.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="browse-wrapper">
+        <div class="browse-top">
+            <h1 class="browse-title">Browse Artworks</h1>
+            <input type="text" class="browse-search" id="browseSearch" placeholder="Search artworks or artists...">
+        </div>
+
+        <div class="filter-row" id="filterRow">
+            <span class="filter-pill active" data-filter="All">All</span>
+            <span class="filter-pill" data-filter="Illustrations">Illustrations</span>
+            <span class="filter-pill" data-filter="3D Models">3D Models</span>
+            <span class="filter-pill" data-filter="Animation">Animation</span>
+            <span class="filter-pill" data-filter="Stickers">Stickers</span>
+            <span class="filter-pill" data-filter="Character Design">Character Design</span>
+            <span class="filter-pill" data-filter="Concept Art">Concept Art</span>
+            <span class="filter-pill" data-filter="Fan Art">Fan Art</span>
+            <span class="filter-pill" data-filter="Photography">Photography</span>
+        </div>
+
+        <div class="artwork-grid" id="artworkGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">🎨</div>
+                <p class="empty-state-text">No artworks yet</p>
+                <p class="empty-state-sub">Artworks uploaded by artists will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARTWORK MODAL -->
+    <div class="artwork-modal" id="artworkModal">
+        <div class="modal-content">
+            <div class="modal-image-side">
+                <img id="modalImage" src="" alt="Artwork">
+            </div>
+            <div class="modal-info-side">
+                <div class="modal-top-row">
+                    <button class="report-btn" onclick="openReportModal()">⚑ Report</button>
+                    <button class="settings-icon-btn">⚙️</button>
+                </div>
+                <div>
+                    <p class="modal-artwork-title" id="modalTitle"></p>
+                    <div style="margin-top:6px;"><span class="modal-artwork-category" id="modalCategory"></span></div>
+                </div>
+                <div class="modal-artwork-details" id="modalDesc"></div>
+                <div class="modal-artist-row">
+                    <img id="modalArtistAvatar" src="" class="modal-artist-avatar" alt="Artist" style="border-radius:50%;object-fit:cover;">
+                    <div>
+                        <p class="modal-artist-name" id="modalArtistName"></p>
+                        <p class="modal-artist-handle" id="modalArtistHandle"></p>
+                    </div>
+                </div>
+                <div>
+                    <p class="payment-label">Payment Options</p>
+                   <div id="paypal-button-container" style="margin-top:8px;"></div>
+<div id="paypal-status" style="font-size:12px;margin-top:8px;color:#4caf50;display:none;"></div>
+                    </div>
+                </div>
+                <div class="terms-box">
+                    <strong>Terms & Conditions</strong>
+                    All transactions are final. Artwork previews are watermarked and will only be released in full upon confirmed payment. By proceeding, you agree to ARTICOM's terms of service.
+                </div>
+                <button class="msg-artist-btn" id="msgArtistBtn">💬 Message Artist</button>
+            </div>
+        </div>
+        <button class="modal-close" id="modalClose">✕</button>
+    </div>
+
+    <!-- REPORT MODAL -->
+    <div class="report-modal" id="reportModal">
+        <div class="report-box">
+            <h3>⚑ Report Artwork</h3>
+            <div class="report-options">
+                <label class="report-option"><input type="radio" name="reportReason" value="Stolen artwork"> Stolen artwork</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Inappropriate content"> Inappropriate content</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Scam or fraud"> Scam or fraud</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Spam"> Spam</label>
+                <label class="report-option"><input type="radio" name="reportReason" value="Other"> Other</label>
+            </div>
+            <div class="report-actions">
+                <button class="report-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="report-submit" onclick="submitReport()">Submit Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+    var activeFilter = 'All';
+    var currentArtist = null;
+    var allArtworks = [];
+
+    // ── LOAD ARTWORKS FROM DATABASE ───────────────────────────
+    fetch('/api/artworks')
+      .then(function(r) { return r.json(); })
+      .then(function(rows) {
+        allArtworks = rows.map(function(a) {
+          return {
+            id:          a.id,
+            title:       a.title,
+            category:    a.category,
+            description: a.price ? '₱' + a.price : '',
+            image:       a.image_path ? '/uploads/' + a.image_path : 'https://placehold.co/400x300/3a3535/e3bfdb?text=Artwork',
+            artist: {
+              name:   a.artist_name,
+              handle: '@' + a.artist_name.toLowerCase().replace(/\s+/g, ''),
+              avatar: 'https://i.pravatar.cc/40?u=' + a.user_id
+            }
+          };
+        });
+        renderGrid(allArtworks);
+      })
+      .catch(function(err) { console.error('Failed to load artworks:', err); });
+
+    function renderGrid(artworks) {
+        var grid = document.getElementById('artworkGrid');
+        var query = document.getElementById('browseSearch').value.toLowerCase().trim();
+        grid.innerHTML = '';
+
+        var data = artworks || [];
+        var filtered = data.filter(function(a) {
+            var matchFilter = activeFilter === 'All' || a.category === activeFilter;
+            var matchSearch = !query || a.title.toLowerCase().includes(query) || a.artist.name.toLowerCase().includes(query) || a.category.toLowerCase().includes(query);
+            return matchFilter && matchSearch;
+        });
+
+        if (!filtered.length) {
+            grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎨</div><p class="empty-state-text">No artworks found</p><p class="empty-state-sub">Try a different filter or search term.</p></div>';
+            return;
+        }
+
+        filtered.forEach(function(artwork) {
+            var card = document.createElement('div');
+            card.className = 'artwork-card';
+            card.innerHTML =
+                '<img src="' + artwork.image + '" class="artwork-img" alt="' + artwork.title + '">' +
+                '<div class="artwork-overlay"><span class="artwork-overlay-text">View Artwork</span></div>' +
+                '<div class="artwork-info">' +
+                    '<p class="artwork-title">' + artwork.title + '</p>' +
+                    '<span class="artwork-artist-name">' + artwork.artist.name + '</span>' +
+                    '<p class="artwork-category">' + artwork.category + '</p>' +
+                '</div>';
+            card.addEventListener('click', function() { openModal(artwork); });
+            grid.appendChild(card);
+        });
+    }
+
+    function openModal(artwork) {
+        currentArtist = artwork.artist;
+        document.getElementById('modalImage').src = artwork.image;
+        document.getElementById('modalTitle').textContent = artwork.title;
+        document.getElementById('modalCategory').textContent = artwork.category;
+        document.getElementById('modalDesc').textContent = artwork.description;
+        document.getElementById('modalArtistAvatar').src = artwork.artist.avatar;
+        document.getElementById('modalArtistName').textContent = artwork.artist.name;
+        document.getElementById('modalArtistHandle').textContent = artwork.artist.handle;
+        document.getElementById('modalArtistAvatar').onclick = function() {
+            window.location.href = 'other-page2.html';
+        };
+        document.getElementById('artworkModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+         renderPayPalButton(artwork);
+    }
+
+    document.getElementById('msgArtistBtn').addEventListener('click', function() {
+        if (currentArtist) {
+            document.getElementById('artworkModal').classList.remove('show');
+            document.body.style.overflow = '';
+            window.location.href = 'chat.html?with=' + encodeURIComponent(currentArtist.name);
+        }
+    });
+
+    document.getElementById('modalClose').addEventListener('click', function() {
+        document.getElementById('artworkModal').classList.remove('show');
+        document.body.style.overflow = '';
+    });
+
+    document.getElementById('artworkModal').addEventListener('click', function(e) {
+        if (e.target === this) { this.classList.remove('show'); document.body.style.overflow = ''; }
+    });
+
+    document.querySelectorAll('.filter-pill').forEach(function(pill) {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            activeFilter = this.getAttribute('data-filter');
+            renderGrid(allArtworks);
+        });
+    });
+
+    document.getElementById('browseSearch').addEventListener('input', function() { renderGrid(allArtworks); });
+
+    function openReportModal() { document.getElementById('reportModal').classList.add('show'); }
+    function closeReportModal() { document.getElementById('reportModal').classList.remove('show'); }
+
+    function submitReport() {
+        var selected = document.querySelector('input[name="reportReason"]:checked');
+        if (!selected) { alert('Please select a reason.'); return; }
+        closeReportModal();
+        document.getElementById('artworkModal').classList.remove('show');
+        document.body.style.overflow = '';
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;z-index:99999;';
+        toast.textContent = 'Report submitted successfully.';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 3000);
+    }
+</script>
+<!-- PayPal SDK - replace YOUR_CLIENT_ID with your actual sandbox client id -->
+<script src="https://www.paypal.com/sdk/js?client-id=AcFCxPypADxS19JnZ8JItQvNht95nd2vxQFJaNjzDgFYiPDiag9jC22XgD6wxS8mOu4rOPBLPSZjYJLp&currency=USD"></script>
+<script>
+    var currentPaypalArtwork = null;
+
+    function renderPayPalButton(artwork) {
+        currentPaypalArtwork = artwork;
+        var container = document.getElementById('paypal-button-container');
+        container.innerHTML = '';
+
+        paypal.Buttons({
+            style: {
+                layout: 'horizontal',
+                color:  'blue',
+                shape:  'pill',
+                label:  'pay'
+            },
+            createOrder: function(data, actions) {
+                var amount = artwork.description ? artwork.description.replace('₱','').trim() : '5.00';
+                if (isNaN(parseFloat(amount))) amount = '5.00';
+
+                return fetch('/api/paypal/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: amount,
+                        description: 'Payment for: ' + artwork.title
+                    })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { return data.orderID; });
+            },
+            onApprove: function(data, actions) {
+                var user = {};
+                try { user = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+
+                return fetch('/api/paypal/capture-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderID:     data.orderID,
+                        client_id:   user.id,
+                        artist_id:   currentPaypalArtwork.id || null,
+                        amount:      currentPaypalArtwork.description || '5.00',
+                        description: 'Payment for: ' + currentPaypalArtwork.title
+                    })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(result) {
+                    if (result.success) {
+                        var status = document.getElementById('paypal-status');
+                        status.style.display = 'block';
+                        status.textContent   = '✅ Payment successful! Thank you.';
+                    }
+                });
+            },
+            onError: function(err) {
+                alert('Payment failed. Please try again.');
+            }
+        }).render('#paypal-button-container');
+    }
+</script>
+</body>
+</html>

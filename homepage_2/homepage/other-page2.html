@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-banner {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #6e3078, #3a1a40);
+            background-size: cover;
+            background-position: center;
+            display: block;
+        }
+
+        .profile-header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #2f2f2f;
+            margin-top: -60px;
+            display: block;
+        }
+
+        .profile-info { margin-top: 1rem; }
+
+        .profile-display-name { font-size: 1.8rem; font-weight: 900; color: white; margin: 0 0 4px; }
+        .profile-username { font-size: 1rem; color: #e3bfdb; margin: 4px 0 12px; }
+
+        .profile-category-badge {
+            display: inline-block;
+            background: #6e3078;
+            color: white;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .profile-bio { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.7; max-width: 600px; margin-bottom: 16px; }
+
+        .profile-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .profile-tag { background: rgba(110,48,120,0.4); border: 1px solid rgba(227,191,219,0.3); color: #e3bfdb; font-size: 12px; padding: 3px 12px; border-radius: 20px; }
+
+        .profile-socials { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 2rem; }
+        .profile-socials a { background: #3a3535; color: white; text-decoration: none; padding: 6px 16px; border-radius: 8px; font-size: 13px; transition: background 0.2s; }
+        .profile-socials a:hover { background: #6e3078; }
+
+        .profile-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0; }
+
+        .edit-profile-btn {
+            display: inline-block;
+            background: #6e3078;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .edit-profile-btn:hover { background: #8b4ea6; transform: translateY(-2px); }
+
+        .artworks-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        .art-label {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+        }
+
+        .art-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .art-card {
+            background: #3a3535;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s ease;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .art-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-color: rgba(227,191,219,0.3); }
+
+        .art-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; display: block; }
+
+        .upload-art-btn {
+            background: rgba(110,48,120,0.3);
+            border: 2px dashed rgba(227,191,219,0.3);
+            color: #e3bfdb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .upload-art-btn:hover { background: rgba(110,48,120,0.5); border-color: #e3bfdb; }
+        .upload-art-btn-icon { font-size: 1.8rem; }
+
+        .empty-artworks {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="index.html" class="brand-container-link">
+            <img src="homepage.png" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container message-container">
+                <button class="header-btn message-btn" title="Messages">💬</button>
+                <div class="big-panel">
+                    <input type="text" id="msgSearch" placeholder="Search messages..." class="msg-search">
+                    <ul id="Messages"></ul>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-size:12px;opacity:0.6;margin:0;">Artist</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='profile-edit.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">✏️ Edit Profile</button>
+                        <button onclick="window.location.href='other-page2.html'" style="width:100%;padding:9px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:13px;cursor:pointer;">👁️ View Profile</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BANNER -->
+    <div class="profile-banner" id="bannerSection"></div>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <img id="profileAvatar" src="img.jpg" class="profile-avatar" alt="Profile picture">
+        <div class="profile-info">
+            <h1 class="profile-display-name" id="profileName">Your Name</h1>
+            <p class="profile-username" id="profileUsername">@username</p>
+            <div id="profileCategory"></div>
+            <p class="profile-bio" id="profileBio">No bio yet. Edit your profile to add one!</p>
+            <div class="profile-tags" id="profileTags"></div>
+            <div class="profile-socials" id="profileSocials"></div>
+            <a href="profile-edit.html" class="edit-profile-btn">✏️ Edit Profile</a>
+        </div>
+        <hr class="profile-divider">
+    </div>
+
+    <!-- ARTWORKS -->
+    <div class="artworks-section">
+        <h2 class="art-label">Artworks</h2>
+        <div class="art-grid" id="artGrid">
+            <a href="upload.html" class="upload-art-btn">
+                <span class="upload-art-btn-icon">+</span>
+                <span>Upload</span>
+            </a>
+            <div class="empty-artworks">No artworks uploaded yet.</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            var saved = JSON.parse(localStorage.getItem('articom-profile') || '{}');
+
+            if (saved.avatar) {
+                document.getElementById('profileAvatar').src = saved.avatar;
+                document.getElementById('profileImage').src = saved.avatar;
+            }
+
+            if (saved.banner && saved.banner !== '') {
+                var banner = document.getElementById('bannerSection');
+                banner.style.backgroundImage = 'url(\'' + saved.banner + '\')';
+                banner.style.backgroundSize = 'cover';
+                banner.style.backgroundPosition = 'center';
+            }
+
+            if (saved.displayName) document.getElementById('profileName').textContent = saved.displayName;
+            if (saved.username) document.getElementById('profileUsername').textContent = saved.username.startsWith('@') ? saved.username : '@' + saved.username;
+            if (saved.bio) document.getElementById('profileBio').textContent = saved.bio;
+
+            if (saved.artCategory) {
+                var badge = document.createElement('span');
+                badge.className = 'profile-category-badge';
+                badge.textContent = saved.artCategory;
+                document.getElementById('profileCategory').appendChild(badge);
+            }
+
+            var tagsContainer = document.getElementById('profileTags');
+            if (saved.tags && saved.tags.length) {
+                saved.tags.forEach(function(tag) {
+                    var span = document.createElement('span');
+                    span.className = 'profile-tag';
+                    span.textContent = tag;
+                    tagsContainer.appendChild(span);
+                });
+            }
+
+            var socials = [
+                { id: 'twitter', label: '🐦 Twitter' },
+                { id: 'instagram', label: '📸 Instagram' },
+                { id: 'artstation', label: '🎨 ArtStation' },
+                { id: 'website', label: '🌐 Website' },
+            ];
+
+            var socialsContainer = document.getElementById('profileSocials');
+            socials.forEach(function(s) {
+                if (saved[s.id]) {
+                    var a = document.createElement('a');
+                    a.href = saved[s.id];
+                    a.target = '_blank';
+                    a.textContent = s.label;
+                    socialsContainer.appendChild(a);
+                }
+            });
+
+            // Load artworks from localStorage — will be replaced by Firebase
+          const user = JSON.parse(localStorage.getItem('articom-user') || '{}');
+fetch('/api/artworks')
+  .then(r => r.json())
+  .then(artworks => {
+    // filter only this user's artworks
+    const mine = artworks.filter(a => a.user_id == user.id);
+    // use 'mine' to render your artwork cards
+    console.log('My artworks:', mine);
+  });
+            var grid = document.getElementById('artGrid');
+            grid.innerHTML = '';
+
+            var uploadBtn = document.createElement('a');
+            uploadBtn.href = 'upload.html';
+            uploadBtn.className = 'upload-art-btn';
+            uploadBtn.innerHTML = '<span class="upload-art-btn-icon">+</span><span>Upload</span>';
+            grid.appendChild(uploadBtn);
+
+            if (!artworks.length) {
+                var empty = document.createElement('div');
+                empty.className = 'empty-artworks';
+                empty.textContent = 'No artworks uploaded yet.';
+                grid.appendChild(empty);
+            } else {
+                artworks.forEach(function(artwork) {
+                    var card = document.createElement('div');
+                    card.className = 'art-card';
+                    if (artwork.images && artwork.images.length) {
+                        var img = document.createElement('img');
+                        img.src = artwork.images[0];
+                        img.alt = artwork.title;
+                        card.appendChild(img);
+                    } else {
+                        card.style.background = '#6f2c7f';
+                        card.innerHTML = '<span style="color:rgba(255,255,255,0.4);font-size:12px;">' + artwork.title + '</span>';
+                    }
+                    grid.appendChild(card);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
