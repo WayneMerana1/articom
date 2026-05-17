@@ -1,2 +1,6 @@
-.vs/ 
+node_modules/ 
+database.db 
+uploads/ 
+.env 
+node_modules/ 
 .vs/ 
