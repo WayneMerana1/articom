@@ -560,4 +560,5 @@ app.post('/api/send-reset-otp', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log('✅ ARTICOM running on port ' + PORT);
+     console.log('📁 Open: http://localhost:3000/folder_a.vscode/index.html');
 });
