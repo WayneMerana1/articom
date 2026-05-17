@@ -384,6 +384,43 @@
 
         loadStats();
         loadReports();
+
+
+        fetch('/api/admin/stats')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    document.getElementById('totalUsers')        && (document.getElementById('totalUsers').textContent        = data.total_users);
+    document.getElementById('totalArtists')      && (document.getElementById('totalArtists').textContent      = data.total_artists);
+    document.getElementById('totalArtworks')     && (document.getElementById('totalArtworks').textContent     = data.total_artworks);
+    document.getElementById('totalTransactions') && (document.getElementById('totalTransactions').textContent = data.total_transactions);
+
+    var table = document.getElementById('usersTable');
+    if (table && data.users) {
+      table.innerHTML = '';
+      data.users.forEach(function(u) {
+        var row = document.createElement('tr');
+        row.innerHTML =
+          '<td>' + u.id + '</td>' +
+          '<td>' + u.fullname + '</td>' +
+          '<td>' + u.email + '</td>' +
+          '<td><span style="background:#6e3078;padding:3px 10px;border-radius:20px;font-size:11px;">' + u.role + '</span></td>' +
+          '<td>' + (u.created || '') + '</td>' +
+          '<td><button onclick="deleteUser(' + u.id + ')" style="background:#c0392b;color:white;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Delete</button></td>';
+        table.appendChild(row);
+      });
+    }
+  });
+
+function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  fetch('/api/admin/user/' + id, { method: 'DELETE' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) { alert('User deleted!'); location.reload(); }
+    });
+}
     </script>
+
+
 </body>
 </html>

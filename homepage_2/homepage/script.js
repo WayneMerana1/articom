@@ -200,6 +200,29 @@ document.addEventListener('DOMContentLoaded', function () {
         openProfilePageBtn.addEventListener('click', function () {
             window.location.href = 'other-page2.html';
         });
+
+
+        // ── NOTIFICATIONS ─────────────────────────────────────────
+var currentUser = {};
+try { currentUser = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+
+if (currentUser.id) {
+    fetch('/api/notifications/' + currentUser.id)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var total = (data.messages ? data.messages.length : 0) + (data.commissions ? data.commissions.length : 0);
+        if (total > 0) {
+            var bell = document.querySelector('.mail-btn');
+            if (bell) {
+                bell.style.position = 'relative';
+                var badge = document.createElement('span');
+                badge.style.cssText = 'background:red;color:white;border-radius:50%;padding:1px 5px;font-size:10px;position:absolute;top:-4px;right:-4px;';
+                badge.textContent = total;
+                bell.appendChild(badge);
+            }
+        }
+      });
+}
     }
 
 });
