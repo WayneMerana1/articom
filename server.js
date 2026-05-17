@@ -10,6 +10,19 @@ const { WebSocketServer } = require('ws');
 const paypal   = require('@paypal/checkout-server-sdk');
 
 const app = express();
+const nodemailer = require('nodemailer');
+
+// ── EMAIL SETUP ───────────────────────────────────────────────
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: waynemerana@gmail.com',      // replace with your gmail
+        pass: 'vcla dpsc toer pxop'           // replace with app password
+    }
+});
+
+// Store OTPs temporarily
+const otpStore = new Map(); // email -> { otp, expires }
 
 // ── MIDDLEWARE ────────────────────────────────────────────────
 app.use(cors());
@@ -430,6 +443,118 @@ wss.on('connection', function(ws) {
         } catch (e) {}
     });
     ws.on('close', function() { if (ws.user_id) clients.delete(ws.user_id); });
+});
+
+// ── SEND OTP ──────────────────────────────────────────────────
+app.post('/api/send-otp', async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.json({ success: false, message: 'Email required.' });
+
+    // Check if email looks real (basic check)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.json({ success: false, message: 'Invalid email format.' });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+    otpStore.set(email, { otp, expires });
+
+    try {
+        await transporter.sendMail({
+            from: '"ARTICOM" <YOUR_GMAIL@gmail.com>',
+            to: email,
+            subject: 'Your ARTICOM OTP Code',
+            html: `
+                <div style="font-family:Arial,sans-serif;max-width:400px;margin:auto;padding:30px;background:#3a3535;border-radius:16px;color:white;">
+                    <h2 style="color:#e3bfdb;text-align:center;">ARTICOM</h2>
+                    <p>Your OTP verification code is:</p>
+                    <div style="font-size:36px;font-weight:900;text-align:center;color:#e3bfdb;letter-spacing:8px;padding:20px;background:#272222;border-radius:12px;margin:20px 0;">
+                        ${otp}
+                    </div>
+                    <p style="font-size:12px;color:rgba(255,255,255,0.5);">This code expires in 5 minutes. Do not share it with anyone.</p>
+                </div>
+            `
+        });
+        res.json({ success: true, message: 'OTP sent!' });
+    } catch (e) {
+        console.error('Email error:', e.message);
+        res.json({ success: false, message: 'Failed to send email.' });
+    }
+});
+
+// ── VERIFY OTP ─────────────────────────────────────────────────
+app.post('/api/verify-otp', (req, res) => {
+    const { email, otp } = req.body;
+    const stored = otpStore.get(email);
+
+    if (!stored) return res.json({ success: false, message: 'OTP not found. Please request again.' });
+    if (Date.now() > stored.expires) {
+        otpStore.delete(email);
+        return res.json({ success: false, message: 'OTP expired. Please request again.' });
+    }
+    if (stored.otp !== otp) return res.json({ success: false, message: 'Wrong OTP!' });
+
+    otpStore.delete(email);
+    res.json({ success: true });
+});
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────
+app.post('/api/forgot-password', async (req, res) => {
+    const { email, newPassword, otp } = req.body;
+
+    // Verify OTP first
+    const stored = otpStore.get(email + '_reset');
+    if (!stored || Date.now() > stored.expires || stored.otp !== otp) {
+        return res.json({ success: false, message: 'Invalid or expired OTP.' });
+    }
+    otpStore.delete(email + '_reset');
+
+    try {
+        const user = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
+        if (!user) return res.json({ success: false, message: 'Email not found!' });
+
+        const hashed = bcrypt.hashSync(newPassword, 10);
+        await dbRun('UPDATE users SET password = ? WHERE email = ?', [hashed, email]);
+        res.json({ success: true });
+    } catch (e) {
+        res.json({ success: false, message: e.message });
+    }
+});
+
+// ── SEND RESET OTP ────────────────────────────────────────────
+app.post('/api/send-reset-otp', async (req, res) => {
+    const { email } = req.body;
+
+    const user = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
+    if (!user) return res.json({ success: false, message: 'Email not registered!' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = Date.now() + 5 * 60 * 1000;
+    otpStore.set(email + '_reset', { otp, expires });
+
+    try {
+        await transporter.sendMail({
+            from: '"ARTICOM" <waynemerana@gmail.com>',
+            to: email,
+            subject: 'ARTICOM Password Reset',
+            html: `
+                <div style="font-family:Arial,sans-serif;max-width:400px;margin:auto;padding:30px;background:#3a3535;border-radius:16px;color:white;">
+                    <h2 style="color:#e3bfdb;text-align:center;">ARTICOM</h2>
+                    <p>Your password reset code is:</p>
+                    <div style="font-size:36px;font-weight:900;text-align:center;color:#e3bfdb;letter-spacing:8px;padding:20px;background:#272222;border-radius:12px;margin:20px 0;">
+                        ${otp}
+                    </div>
+                    <p style="font-size:12px;color:rgba(255,255,255,0.5);">This code expires in 5 minutes.</p>
+                </div>
+            `
+        });
+        res.json({ success: true });
+    } catch (e) {
+        res.json({ success: false, message: 'Failed to send email.' });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
