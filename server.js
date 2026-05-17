@@ -464,7 +464,7 @@ app.post('/api/send-otp', async (req, res) => {
 
     try {
         await transporter.sendMail({
-            from: '"ARTICOM" <YOUR_GMAIL@gmail.com>',
+      from: '"ARTICOM" <waynemerana@gmail.com>',
             to: email,
             subject: 'Your ARTICOM OTP Code',
             html: `
