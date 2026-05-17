@@ -16,8 +16,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: waynemerana@gmail.com',      // replace with your gmail
-        pass: 'vcla dpsc toer pxop'           // replace with app password
+        user: 'waynemerana@gmail.com', 
+        pass: 'vcla dpsc toer pxop'        // replace with app password
     }
 });
 
