@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Register with Vanta Background</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="vanta-bg"></div>
+
+  <div class="center-wrapper">
+    <div class="container">
+
+      <!-- LOGIN -->
+      <div class="form-box active" id="login-form">
+
+        <h2>Login</h2>
+        <p style="margin-top:8px;">
+  <a href="#" onclick="showForgotPassword()" style="color:#e3bfdb;font-size:13px;">Forgot password?</a>
+</p>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button type="button" onclick="handleLogin()">Login</button>
+        <p>Don't have an account?
+          <a href="#" onclick="showForm('register-form')">Register here!</a>
+        </p>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="form-box" id="register-form">
+        <h2>Register</h2>
+        <input type="text" id="reg-name" placeholder="Name" required>
+        <input type="email" id="reg-email" placeholder="Email" required>
+        <input type="password" id="reg-password" placeholder="Password" required>
+        <input type="date" id="reg-birthday" required>
+        <select id="reg-gender" required>
+          <option value="">--Select Gender--</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        <select id="reg-role" required>
+          <option value="">--You are a?--</option>
+          <option value="user">User</option>
+          <option value="artist">Artist</option>
+        </select>
+        <button type="button" onclick="handleRegister()">Register</button>
+        <p>Already have an account?
+          <a href="#" onclick="showForm('login-form')">Login</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+<script src="/folder_a.vscode/script_v2.js"></script>
+
+  <script>
+    window.onload = function () {
+      VANTA.BIRDS({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        backgroundColor: 0x472454,
+        color1: 0x271d1d,
+        color2: 0xea16cb
+      });
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 200);
+    };
+  </script>
+
+</body>
+</html>

@@ -27,13 +27,13 @@ const otpStore = new Map(); // email -> { otp, expires }
 // ── MIDDLEWARE ────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'folder_a.vscode'), { etag: false, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
+app.use(express.static(path.join(__dirname, 'login'), { etag: false, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 app.use(express.static(path.join(__dirname, 'homepage_2', 'homepage'), { etag: false, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 app.use(express.static('.', { etag: false, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'folder_a.vscode', 'index.html'));
+   res.sendFile(path.join(__dirname, 'login', 'index.html'));
 });
 
 // ── DATABASE ──────────────────────────────────────────────────
