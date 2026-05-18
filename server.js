@@ -46,7 +46,7 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS users (
         id       INTEGER PRIMARY KEY AUTOINCREMENT,
         fullname TEXT,
-        email    TEXT UNIQUE,
+        email    TEXT    UNIQUE,
         password TEXT,
         birthday TEXT,
         gender   TEXT,
@@ -555,6 +555,18 @@ app.post('/api/send-reset-otp', async (req, res) => {
     } catch (e) {
         res.json({ success: false, message: 'Failed to send email.' });
     }
+});
+
+// Force serve correct index.html
+app.get('/folder_a.vscode/index.html', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.sendFile(path.join(__dirname, 'folder_a.vscode', 'index.html'));
+});
+
+// Force serve correct script.js
+app.get('/folder_a.vscode/script.js', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.sendFile(path.join(__dirname, 'folder_a.vscode', 'script.js'));
 });
 
 const PORT = process.env.PORT || 3000;
