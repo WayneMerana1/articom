@@ -216,9 +216,11 @@
           .then(function(r) { return r.json(); })
           .then(function(users) {
             contacts = users
-              .filter(function(u) { return u.id != currentUser.id; })
+  .filter(function(u) { 
+    return u.id != currentUser.id && u.role !== 'admin';
+  })
               .map(function(u) {
-                return { id: u.id, name: u.fullname, role: u.role, avatar: 'https://i.pravatar.cc/40?u=' + u.id };
+                return { id: u.id, name: u.fullname, role: u.role, avatar: null};
               });
 
             renderContacts();
@@ -236,6 +238,10 @@
 
         // ── RENDER CONTACTS ───────────────────────────────────
         function renderContacts(filter) {
+
+        var initials = contact.name ? contact.name.charAt(0).toUpperCase() : '?';
+'<div style="width:40px;height:40px;border-radius:50%;background:#6e3078;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;flex-shrink:0;">' + initials + '</div>' +
+
             filter = (filter || '').toLowerCase();
             var list = document.getElementById('contactList');
             list.innerHTML = '';
@@ -294,17 +300,22 @@
                 md.innerHTML = '';
                 if (!msgs.length) {
                     md.innerHTML = '<div class="chat-placeholder" style="text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:2rem;">Start the conversation! 👋</div>';
-                } else {
-                    msgs.forEach(function(m) {
-                        appendMessage({
-                            type: 'text',
-                            text: m.message,
-                            sent: m.sender_id == currentUser.id,
-                            time: formatTime(m.sent_at)
-                        }, md);
-                    });
-                    md.scrollTop = md.scrollHeight;
-                }
+               } else {
+    var deleteBtn = msg.sent 
+        ? '<button onclick="deleteMsg(this,' + (msg.id||0) + ')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:10px;cursor:pointer;margin-top:2px;">🗑 unsend</button>'
+        : '';
+    wrapper.innerHTML =
+        '<div class="msg-bubble ' + (msg.sent ? 'sent' : 'received') + '">' + msg.text + '</div>' +
+        '<span class="msg-time ' + (msg.sent ? 'right' : '') + '">' + msg.time + ' ' + deleteBtn + '</span>';
+}
+function deleteMsg(btn, id) {
+    if (!confirm('Unsend this message?')) return;
+    var wrapper = btn.closest('div[style]');
+    if (wrapper) wrapper.remove();
+    if (id) {
+        fetch('/api/message/' + id, { method: 'DELETE' });
+    }
+}
               });
 
             setTimeout(function() { var i = document.getElementById('chatInput'); if(i) i.focus(); }, 100);

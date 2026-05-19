@@ -568,7 +568,29 @@ app.get('/folder_a.vscode/script.js', (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     res.sendFile(path.join(__dirname, 'folder_a.vscode', 'script.js'));
 });
-
+// ── GET USER TRANSACTIONS ─────────────────────────────────────
+app.get('/api/my-transactions/:user_id', async (req, res) => {
+    try {
+        const rows = await dbAll(`
+            SELECT t.*, 
+                   c.fullname as client_name,
+                   a.fullname as artist_name
+            FROM transactions t
+            LEFT JOIN users c ON t.client_id = c.id
+            LEFT JOIN users a ON t.artist_id = a.id
+            WHERE t.client_id = ? OR t.artist_id = ?
+            ORDER BY t.created DESC
+        `, [req.params.user_id, req.params.user_id]);
+        res.json(rows);
+    } catch(e) { res.json([]); }
+});
+// ── DELETE MESSAGE ────────────────────────────────────────────
+app.delete('/api/message/:id', async (req, res) => {
+    try {
+        await dbRun('DELETE FROM messages WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch(e) { res.json({ success: false }); }
+});
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log('✅ ARTICOM running on port ' + PORT);

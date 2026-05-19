@@ -349,6 +349,38 @@ fetch('/api/transaction', {
                     }
                 });
         };
-    </script>
+    </script
+    <div style="max-width:700px;margin:2rem auto;padding:0 2rem;">
+    <h2 style="color:#e3bfdb;font-size:1.5rem;font-weight:900;text-transform:uppercase;margin-bottom:1rem;">Payment History</h2>
+    <div id="paymentHistory" style="display:flex;flex-direction:column;gap:12px;">
+        <p style="color:rgba(255,255,255,0.4);">Loading...</p>
+    </div>
+</div>
+
+<script>
+var user = {};
+try { user = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+
+if (user.id) {
+    fetch('/api/my-transactions/' + user.id)
+      .then(function(r) { return r.json(); })
+      .then(function(rows) {
+        var div = document.getElementById('paymentHistory');
+        if (!rows.length) { div.innerHTML = '<p style="color:rgba(255,255,255,0.4);">No payment history yet.</p>'; return; }
+        div.innerHTML = rows.map(function(t) {
+            return '<div style="background:#3a3535;border-radius:12px;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">' +
+                '<div>' +
+                    '<p style="color:white;font-weight:700;margin:0;">' + (t.description || 'Payment') + '</p>' +
+                    '<p style="color:rgba(255,255,255,0.4);font-size:12px;margin:4px 0 0;">' + (t.created || '') + ' • ' + (t.payment_method || '') + '</p>' +
+                '</div>' +
+                '<div style="text-align:right;">' +
+                    '<p style="color:#4caf50;font-weight:900;font-size:1.1rem;margin:0;">₱' + (t.amount || '0') + '</p>' +
+                    '<span style="background:rgba(76,175,80,0.2);color:#4caf50;padding:2px 10px;border-radius:20px;font-size:11px;">' + (t.status || 'completed') + '</span>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+      });
+}
+</script>
 </body>
 </html>
