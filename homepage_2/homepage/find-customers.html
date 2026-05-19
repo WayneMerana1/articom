@@ -349,14 +349,40 @@ function renderPosts(posts) {
             setTimeout(function() { toast.remove(); }, 3000);
         }
 
-        document.querySelectorAll('.filter-pill').forEach(function(pill) {
-            pill.addEventListener( 'click', function() {
+     document.querySelectorAll('.filter-pill').forEach(function(pill) {
+            pill.addEventListener('click', function() {
                 document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
                 this.classList.add('active');
                 activeFilter = this.getAttribute('data-filter');
-                renderPosts();
+                renderPosts(allPosts);
             });
         });
+
+        // ── LOAD REAL COMMISSIONS FROM DATABASE ───────────────
+        var allPosts = [];
+
+        fetch('/api/commissions')
+          .then(function(r) { return r.json(); })
+          .then(function(rows) {
+            allPosts = rows.map(function(c) {
+              return {
+                id:       c.id,
+                username: '@' + (c.client_name || 'client').toLowerCase().replace(/\s+/g, ''),
+                avatar:   'https://i.pravatar.cc/44?u=' + c.client_id,
+                text:     c.description || 'Looking for an artist...',
+                category: c.title || 'General',
+                budget:   c.budget || 'Negotiable',
+                tags:     [],
+                images:   [],
+                time:     c.created || 'Recently',
+                comments: []
+              };
+            });
+            renderPosts(allPosts);
+          })
+          .catch(function() { renderPosts([]); });
+
+    </script>
 
         // ── LOAD REAL COMMISSIONS FROM DATABASE ──────────────────────
 fetch('/api/commissions')

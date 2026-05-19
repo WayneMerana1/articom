@@ -140,7 +140,6 @@
 
     <script src="script.js"></script>
     <script>
-        // ── STATE ─────────────────────────────────────────────
         var role        = localStorage.getItem('articom-role') || 'user';
         var currentUser = {};
         try { currentUser = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
@@ -153,7 +152,6 @@
         var withName = params.get('with');
         var withId   = params.get('id');
 
-        // ── PROFILE ───────────────────────────────────────────
         document.getElementById('userRole').textContent = role === 'artist' ? 'Artist' : 'Client';
         document.getElementById('editProfileBtn').onclick = function() {
             window.location.href = role === 'artist' ? 'profile-edit.html' : 'client-profile-edit.html';
@@ -162,7 +160,6 @@
             window.location.href = role === 'artist' ? 'other-page2.html' : 'client-profile-view.html';
         };
 
-        // ── HELPERS ───────────────────────────────────────────
         function nowTime() {
             return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
@@ -183,10 +180,10 @@
         // ── WEBSOCKET ─────────────────────────────────────────
         function connectWS() {
             try {
-         var wsUrl = window.location.hostname === 'localhost'
-    ? 'ws://localhost:3000'
-    : 'wss://' + window.location.host;
-ws = new WebSocket(wsUrl);
+                var wsUrl = window.location.hostname === 'localhost'
+                    ? 'ws://localhost:3000'
+                    : 'wss://' + window.location.host;
+                ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
                     if (currentUser.id) {
@@ -291,7 +288,6 @@ ws = new WebSocket(wsUrl);
 
             var md = document.getElementById('chatMessages');
 
-            // load message history
             fetch('/api/messages?me=' + currentUser.id + '&other=' + contact.id)
               .then(function(r) { return r.json(); })
               .then(function(msgs) {
@@ -311,10 +307,8 @@ ws = new WebSocket(wsUrl);
                 }
               });
 
-            // focus input
             setTimeout(function() { var i = document.getElementById('chatInput'); if(i) i.focus(); }, 100);
 
-            // send handlers
             document.getElementById('sendBtn').addEventListener('click', sendMessage);
             document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
 
@@ -325,14 +319,12 @@ ws = new WebSocket(wsUrl);
 
                 var now = nowTime();
 
-                // save to DB
                 fetch('/api/message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sender_id: currentUser.id, receiver_id: contact.id, message: text })
                 });
 
-                // push to other user via WebSocket
                 if (ws && ws.readyState === 1) {
                     ws.send(JSON.stringify({
                         type: 'message',
@@ -373,7 +365,7 @@ ws = new WebSocket(wsUrl);
             container.appendChild(wrapper);
         }
 
-        // ── COMMISSION ────────────────────────────────────────
+        // ── COMMISSION MODAL ──────────────────────────────────
         function openCommissionModal()  { document.getElementById('commissionModal').classList.add('show'); }
         function closeCommissionModal() { document.getElementById('commissionModal').classList.remove('show'); }
 
@@ -388,15 +380,22 @@ ws = new WebSocket(wsUrl);
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        client_id: currentUser.id, artist_id: activeContact.id,
-                        title: 'Commission Request', description: text,
-                        budget:x 'Negotiable', deadline: deadline
+                        client_id:   currentUser.id,
+                        artist_id:   activeContact.id,
+                        title:       'Commission Request',
+                        description: text,
+                        budget:      'Negotiable',
+                        deadline:    deadline
                     })
                 });
             }
 
             var md = document.getElementById('chatMessages');
-            if (md) { removePlaceholder(md); appendMessage({ type: 'commission', text: text, deadline: deadline, sent: true, time: nowTime() }, md); md.scrollTop = md.scrollHeight; }
+            if (md) {
+                removePlaceholder(md);
+                appendMessage({ type: 'commission', text: text, deadline: deadline, sent: true, time: nowTime() }, md);
+                md.scrollTop = md.scrollHeight;
+            }
 
             document.getElementById('commissionText').value = '';
             document.getElementById('commissionDeadline').value = '';
