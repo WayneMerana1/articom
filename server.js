@@ -584,6 +584,42 @@ app.get('/api/my-transactions/:user_id', async (req, res) => {
         res.json(rows);
     } catch(e) { res.json([]); }
 });
+
+app.post('/api/paypal/capture-order', async (req, res) => {
+    try {
+        const { orderID, client_id, artist_id, amount, description } = req.body;
+        const request = new paypal.orders.OrdersCaptureRequest(orderID);
+        request.requestBody({});
+        const capture = await paypalClient.execute(request);
+
+        const captureId = capture.result.purchase_units[0].payments.captures[0].id;
+        const paidAmt   = capture.result.purchase_units[0].payments.captures[0].amount.value;
+        const paidAt    = capture.result.purchase_units[0].payments.captures[0].create_time;
+
+        // save to transactions with receipt info
+        await dbRun(
+            `INSERT INTO transactions 
+             (client_id, artist_id, amount, payment_method, description, status) 
+             VALUES (?, ?, ?, 'paypal', ?, 'completed')`,
+            [client_id || null, artist_id || null, paidAmt,
+             (description || 'Commission Payment') + ' | Receipt: ' + captureId]
+        );
+
+        res.json({
+            success: true,
+            receipt: {
+                id:          captureId,
+                amount:      paidAmt,
+                date:        paidAt,
+                description: description || 'Artwork Commission',
+                status:      'COMPLETED'
+            }
+        });
+    } catch (e) {
+        console.error('PayPal capture error:', e.message);
+        res.json({ success: false, message: e.message });
+    }
+});
 // ── DELETE MESSAGE ────────────────────────────────────────────
 app.delete('/api/message/:id', async (req, res) => {
     try {
@@ -607,12 +643,15 @@ app.get('/api/my-transactions/:user_id', async (req, res) => {
     } catch(e) { res.json([]); }
 });
 
+
 app.delete('/api/message/:id', async (req, res) => {
     try {
         await dbRun('DELETE FROM messages WHERE id = ?', [req.params.id]);
         res.json({ success: true });
     } catch(e) { res.json({ success: false }); }
 });
+
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log('✅ ARTICOM running on port ' + PORT);

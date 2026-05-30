@@ -454,62 +454,151 @@
 <script>
     var currentPaypalArtwork = null;
 
-    function renderPayPalButton(artwork) {
-        currentPaypalArtwork = artwork;
-        var container = document.getElementById('paypal-button-container');
-        container.innerHTML = '';
+   function renderPayPalButton(artwork) {
+    currentPaypalArtwork = artwork;
+    var container = document.getElementById('paypal-button-container');
+    container.innerHTML = '';
+    document.getElementById('paypal-status').style.display = 'none';
 
-        paypal.Buttons({
-            style: {
-                layout: 'horizontal',
-                color:  'blue',
-                shape:  'pill',
-                label:  'pay'
-            },
-            createOrder: function(data, actions) {
-                var amount = artwork.description ? artwork.description.replace('₱','').trim() : '5.00';
-                if (isNaN(parseFloat(amount))) amount = '5.00';
+    var user = {};
+    try { user = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
 
-                return fetch('/api/paypal/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: amount,
-                        description: 'Payment for: ' + artwork.title
-                    })
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color:  'blue',
+            shape:  'pill',
+            label:  'pay'
+        },
+
+        createOrder: function(data, actions) {
+            var price = artwork.description
+                ? artwork.description.replace('₱','').trim()
+                : '5.00';
+            if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) price = '5.00';
+
+            return fetch('/api/paypal/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount:      price,
+                    description: 'Payment for: ' + artwork.title
                 })
-                .then(function(r) { return r.json(); })
-                .then(function(data) { return data.orderID; });
-            },
-            onApprove: function(data, actions) {
-                var user = {};
-                try { user = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.success) { alert('Failed to create order: ' + data.message); return null; }
+                return data.orderID;
+            });
+        },
 
-                return fetch('/api/paypal/capture-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderID:     data.orderID,
-                        client_id:   user.id,
-                        artist_id:   currentPaypalArtwork.id || null,
-                        amount:      currentPaypalArtwork.description || '5.00',
-                        description: 'Payment for: ' + currentPaypalArtwork.title
-                    })
+        onApprove: function(data, actions) {
+            // show loading
+            var status = document.getElementById('paypal-status');
+            status.style.display = 'block';
+            status.style.color   = '#e3bfdb';
+            status.textContent   = '⏳ Processing payment...';
+
+            return fetch('/api/paypal/capture-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderID:     data.orderID,
+                    client_id:   user.id || null,
+                    artist_id:   currentPaypalArtwork.artist_id || null,
+                    amount:      currentPaypalArtwork.description
+                                   ? currentPaypalArtwork.description.replace('₱','').trim()
+                                   : '5.00',
+                    description: 'Payment for: ' + currentPaypalArtwork.title
                 })
-                .then(function(r) { return r.json(); })
-                .then(function(result) {
-                    if (result.success) {
-                        var status = document.getElementById('paypal-status');
-                        status.style.display = 'block';
-                        status.textContent   = '✅ Payment successful! Thank you.';
-                    }
-                });
-            },
-            onError: function(err) {
-                alert('Payment failed. Please try again.');
-            }
-        }).render('#paypal-button-container');
-    }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(result) {
+                if (result.success) {
+                    showReceipt(result.receipt, currentPaypalArtwork);
+                } else {
+                    status.style.color = '#ff6b6b';
+                    status.textContent = '❌ Payment failed: ' + (result.message || 'Unknown error');
+                }
+            });
+        },
+
+        onError: function(err) {
+            var status = document.getElementById('paypal-status');
+            status.style.display = 'block';
+            status.style.color   = '#ff6b6b';
+            status.textContent   = '❌ Payment error. Please try again.';
+            console.error('PayPal error:', err);
+        },
+
+        onCancel: function() {
+            var status = document.getElementById('paypal-status');
+            status.style.display = 'block';
+            status.style.color   = 'rgba(255,255,255,0.4)';
+            status.textContent   = 'Payment cancelled.';
+        }
+
+    }).render('#paypal-button-container');
+}
+
+// ── RECEIPT MODAL ─────────────────────────────────────────────
+function showReceipt(receipt, artwork) {
+    var existing = document.getElementById('receiptModal');
+    if (existing) existing.remove();
+
+    var date = receipt.date
+        ? new Date(receipt.date).toLocaleString('en-PH')
+        : new Date().toLocaleString('en-PH');
+
+    var modal = document.createElement('div');
+    modal.id = 'receiptModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;justify-content:center;align-items:center;padding:1rem;';
+    modal.innerHTML =
+        '<div style="background:#2f2f2f;border-radius:20px;max-width:400px;width:100%;border:1px solid rgba(255,255,255,0.1);overflow:hidden;">' +
+            // Header
+            '<div style="background:linear-gradient(135deg,#6e3078,#4a1a55);padding:2rem;text-align:center;">' +
+                '<div style="font-size:3rem;margin-bottom:8px;">✅</div>' +
+                '<h2 style="color:white;margin:0;font-size:1.3rem;font-weight:900;">Payment Successful!</h2>' +
+                '<p style="color:rgba(255,255,255,0.7);font-size:13px;margin:4px 0 0;">Your transaction has been completed</p>' +
+            '</div>' +
+            // Receipt body
+            '<div style="padding:1.5rem;">' +
+                '<div style="background:#272222;border-radius:12px;padding:1.2rem;margin-bottom:1rem;">' +
+                    '<div style="display:flex;justify-content:space-between;margin-bottom:10px;">' +
+                        '<span style="color:rgba(255,255,255,0.5);font-size:12px;">Artwork</span>' +
+                        '<span style="color:white;font-size:13px;font-weight:600;">' + (artwork.title || 'Artwork') + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;margin-bottom:10px;">' +
+                        '<span style="color:rgba(255,255,255,0.5);font-size:12px;">Amount Paid</span>' +
+                        '<span style="color:#4caf50;font-size:16px;font-weight:900;">$' + (receipt.amount || '0.00') + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;margin-bottom:10px;">' +
+                        '<span style="color:rgba(255,255,255,0.5);font-size:12px;">Payment Method</span>' +
+                        '<span style="color:white;font-size:13px;">🅿️ PayPal</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;margin-bottom:10px;">' +
+                        '<span style="color:rgba(255,255,255,0.5);font-size:12px;">Date & Time</span>' +
+                        '<span style="color:white;font-size:12px;">' + date + '</span>' +
+                    '</div>' +
+                    '<div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">' +
+                        '<div style="display:flex;justify-content:space-between;">' +
+                            '<span style="color:rgba(255,255,255,0.5);font-size:12px;">Receipt ID</span>' +
+                            '<span style="color:#e3bfdb;font-size:11px;font-family:monospace;">' + (receipt.id || 'N/A') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:10px;">' +
+                    '<button onclick="window.location.href=\'payment-history.html\'" style="flex:1;padding:12px;background:#6e3078;color:white;border:none;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;">View History</button>' +
+                    '<button onclick="document.getElementById(\'receiptModal\').remove()" style="flex:1;padding:12px;background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:50px;font-size:13px;cursor:pointer;">Close</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    document.body.appendChild(modal);
+
+    // hide the paypal status
+    var status = document.getElementById('paypal-status');
+    if (status) status.style.display = 'none';
+}
 </script>
 </body>
 </html>
