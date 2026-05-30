@@ -16,14 +16,14 @@
         .contact-item { display: flex; align-items: center; gap: 10px; padding: 10px 1.2rem; cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; }
         .contact-item:hover { background: rgba(255,255,255,0.05); }
         .contact-item.active { background: rgba(110,48,120,0.3); border-left-color: #e3bfdb; }
-        .contact-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .contact-initial { width: 40px; height: 40px; border-radius: 50%; background: #6e3078; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; flex-shrink: 0; }
         .contact-info { flex: 1; overflow: hidden; }
         .contact-name { font-size: 13px; font-weight: 600; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .contact-preview { font-size: 11px; color: rgba(255,255,255,0.4); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-area { flex: 1; background: #3a3535; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden; }
         .chat-header { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .chat-header-left { display: flex; align-items: center; gap: 12px; }
-        .chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .chat-header-initial { width: 40px; height: 40px; border-radius: 50%; background: #6e3078; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; flex-shrink: 0; }
         .chat-contact-name { font-size: 15px; font-weight: 700; color: white; margin: 0; }
         .chat-contact-status { font-size: 12px; color: #4caf50; margin: 2px 0 0; }
         .commission-btn { background: #6e3078; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s; flex-shrink: 0; }
@@ -34,6 +34,8 @@
         .msg-bubble.sent { background: #6e3078; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
         .msg-time { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; display: block; }
         .msg-time.right { text-align: right; }
+        .unsend-btn { background: none; border: none; color: rgba(255,255,255,0.25); font-size: 10px; cursor: pointer; margin-left: 6px; }
+        .unsend-btn:hover { color: #ff6b6b; }
         .commission-card { align-self: flex-end; max-width: 80%; background: linear-gradient(135deg, #6e3078, #4a1a55); border-radius: 16px; border-bottom-right-radius: 4px; padding: 1rem 1.2rem; border: 1px solid rgba(227,191,219,0.3); }
         .commission-card.received-commission { align-self: flex-start; border-bottom-right-radius: 16px; border-bottom-left-radius: 4px; background: linear-gradient(135deg, #3a1a55, #2a0a3a); }
         .commission-card-label { font-size: 10px; font-weight: 700; color: #e3bfdb; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -88,9 +90,9 @@
                 <div class="dropdown-panel">
                     <div style="padding:16px;">
                         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-                            <img src="img.jpg" id="profileImage" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                            <div id="headerInitial" style="width:48px;height:48px;border-radius:50%;background:#6e3078;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;">?</div>
                             <div>
-                                <p style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p style="font-weight:600;font-size:14px;margin:0;" id="headerName">My Account</p>
                                 <p style="font-size:12px;opacity:0.6;margin:0;" id="userRole">User</p>
                             </div>
                         </div>
@@ -140,6 +142,7 @@
 
     <script src="script.js"></script>
     <script>
+        // ── STATE ─────────────────────────────────────────────
         var role        = localStorage.getItem('articom-role') || 'user';
         var currentUser = {};
         try { currentUser = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
@@ -152,7 +155,12 @@
         var withName = params.get('with');
         var withId   = params.get('id');
 
+        // ── SET HEADER INFO ───────────────────────────────────
         document.getElementById('userRole').textContent = role === 'artist' ? 'Artist' : 'Client';
+        if (currentUser.fullname) {
+            document.getElementById('headerName').textContent = currentUser.fullname;
+            document.getElementById('headerInitial').textContent = currentUser.fullname.charAt(0).toUpperCase();
+        }
         document.getElementById('editProfileBtn').onclick = function() {
             window.location.href = role === 'artist' ? 'profile-edit.html' : 'client-profile-edit.html';
         };
@@ -160,6 +168,7 @@
             window.location.href = role === 'artist' ? 'other-page2.html' : 'client-profile-view.html';
         };
 
+        // ── HELPERS ───────────────────────────────────────────
         function nowTime() {
             return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
@@ -175,6 +184,10 @@
         function removePlaceholder(md) {
             var ph = md.querySelector('.chat-placeholder');
             if (ph) ph.remove();
+        }
+
+        function getInitial(name) {
+            return name ? name.charAt(0).toUpperCase() : '?';
         }
 
         // ── WEBSOCKET ─────────────────────────────────────────
@@ -198,7 +211,7 @@
                             var md = document.getElementById('chatMessages');
                             if (!md) return;
                             removePlaceholder(md);
-                            appendMessage({ type: 'text', text: data.message, sent: false, time: data.sent_at }, md);
+                            appendMessage({ type: 'text', id: 0, text: data.message, sent: false, time: data.sent_at }, md);
                             md.scrollTop = md.scrollHeight;
                         }
                     } catch(e) {}
@@ -216,11 +229,11 @@
           .then(function(r) { return r.json(); })
           .then(function(users) {
             contacts = users
-  .filter(function(u) { 
-    return u.id != currentUser.id && u.role !== 'admin';
-  })
+              .filter(function(u) {
+                  return u.id != currentUser.id && u.role !== 'admin';
+              })
               .map(function(u) {
-                return { id: u.id, name: u.fullname, role: u.role, avatar: null};
+                return { id: u.id, name: u.fullname, role: u.role };
               });
 
             renderContacts();
@@ -238,10 +251,6 @@
 
         // ── RENDER CONTACTS ───────────────────────────────────
         function renderContacts(filter) {
-
-        var initials = contact.name ? contact.name.charAt(0).toUpperCase() : '?';
-'<div style="width:40px;height:40px;border-radius:50%;background:#6e3078;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;flex-shrink:0;">' + initials + '</div>' +
-
             filter = (filter || '').toLowerCase();
             var list = document.getElementById('contactList');
             list.innerHTML = '';
@@ -254,7 +263,7 @@
                 var item = document.createElement('div');
                 item.className = 'contact-item' + (activeContact && activeContact.id === contact.id ? ' active' : '');
                 item.innerHTML =
-                    '<img src="' + contact.avatar + '" class="contact-avatar" alt="' + contact.name + '">' +
+                    '<div class="contact-initial">' + getInitial(contact.name) + '</div>' +
                     '<div class="contact-info">' +
                         '<p class="contact-name">' + contact.name + '</p>' +
                         '<p class="contact-preview">' + (contact.role || '') + '</p>' +
@@ -270,13 +279,13 @@
             renderContacts(document.getElementById('sidebarSearch').value);
 
             var actionBtn = role === 'user'
-                ? '<button class="commission-btn" onclick="openCommissionModal()">🎨 Commission Request</button>'
+                ? '<button class="commission-btn" onclick="openCommissionModal()">🎨 Commission</button>'
                 : '<button class="commission-btn" onclick="window.location.href=\'transaction.html\'">💳 Transaction</button>';
 
             document.getElementById('chatArea').innerHTML =
                 '<div class="chat-header">' +
                     '<div class="chat-header-left">' +
-                        '<img src="' + contact.avatar + '" alt="' + contact.name + '">' +
+                        '<div class="chat-header-initial">' + getInitial(contact.name) + '</div>' +
                         '<div>' +
                             '<p class="chat-contact-name">' + contact.name + '</p>' +
                             '<p class="chat-contact-status">🟢 Online</p>' +
@@ -294,28 +303,25 @@
 
             var md = document.getElementById('chatMessages');
 
+            // ── LOAD MESSAGE HISTORY ──────────────────────────
             fetch('/api/messages?me=' + currentUser.id + '&other=' + contact.id)
               .then(function(r) { return r.json(); })
               .then(function(msgs) {
                 md.innerHTML = '';
                 if (!msgs.length) {
                     md.innerHTML = '<div class="chat-placeholder" style="text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:2rem;">Start the conversation! 👋</div>';
-               } else {
-    var deleteBtn = msg.sent 
-        ? '<button onclick="deleteMsg(this,' + (msg.id||0) + ')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:10px;cursor:pointer;margin-top:2px;">🗑 unsend</button>'
-        : '';
-    wrapper.innerHTML =
-        '<div class="msg-bubble ' + (msg.sent ? 'sent' : 'received') + '">' + msg.text + '</div>' +
-        '<span class="msg-time ' + (msg.sent ? 'right' : '') + '">' + msg.time + ' ' + deleteBtn + '</span>';
-}
-function deleteMsg(btn, id) {
-    if (!confirm('Unsend this message?')) return;
-    var wrapper = btn.closest('div[style]');
-    if (wrapper) wrapper.remove();
-    if (id) {
-        fetch('/api/message/' + id, { method: 'DELETE' });
-    }
-}
+                } else {
+                    msgs.forEach(function(m) {
+                        appendMessage({
+                            type: 'text',
+                            id:   m.id,
+                            text: m.message,
+                            sent: m.sender_id == currentUser.id,
+                            time: formatTime(m.sent_at)
+                        }, md);
+                    });
+                    md.scrollTop = md.scrollHeight;
+                }
               });
 
             setTimeout(function() { var i = document.getElementById('chatInput'); if(i) i.focus(); }, 100);
@@ -330,12 +336,24 @@ function deleteMsg(btn, id) {
 
                 var now = nowTime();
 
+                // save to DB and get the id back
                 fetch('/api/message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sender_id: currentUser.id, receiver_id: contact.id, message: text })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    // append with real DB id for delete
+                    var chatMd = document.getElementById('chatMessages');
+                    if (chatMd) {
+                        removePlaceholder(chatMd);
+                        appendMessage({ type: 'text', id: data.insertId || 0, text: text, sent: true, time: now }, chatMd);
+                        chatMd.scrollTop = chatMd.scrollHeight;
+                    }
                 });
 
+                // push via WebSocket
                 if (ws && ws.readyState === 1) {
                     ws.send(JSON.stringify({
                         type: 'message',
@@ -346,11 +364,7 @@ function deleteMsg(btn, id) {
                     }));
                 }
 
-                var chatMd = document.getElementById('chatMessages');
-                removePlaceholder(chatMd);
-                appendMessage({ type: 'text', text: text, sent: true, time: now }, chatMd);
                 input.value = '';
-                chatMd.scrollTop = chatMd.scrollHeight;
             }
         }
 
@@ -369,11 +383,24 @@ function deleteMsg(btn, id) {
                     (!msg.sent ? '<div class="commission-card-actions"><button class="accept-btn" onclick="acceptCommission(this)">Accept</button><button class="decline-btn">Decline</button></div>' : '');
                 wrapper.appendChild(card);
             } else {
+                var unsendBtn = msg.sent
+                    ? '<button class="unsend-btn" onclick="unsendMsg(this,' + (msg.id || 0) + ')">🗑 unsend</button>'
+                    : '';
                 wrapper.innerHTML =
                     '<div class="msg-bubble ' + (msg.sent ? 'sent' : 'received') + '">' + msg.text + '</div>' +
-                    '<span class="msg-time ' + (msg.sent ? 'right' : '') + '">' + msg.time + '</span>';
+                    '<span class="msg-time ' + (msg.sent ? 'right' : '') + '">' + msg.time + unsendBtn + '</span>';
             }
             container.appendChild(wrapper);
+        }
+
+        // ── UNSEND MESSAGE ────────────────────────────────────
+        function unsendMsg(btn, id) {
+            if (!confirm('Unsend this message?')) return;
+            var wrapper = btn.closest('div[style*="flex-direction"]');
+            if (wrapper) wrapper.remove();
+            if (id) {
+                fetch('/api/message/' + id, { method: 'DELETE' });
+            }
         }
 
         // ── COMMISSION MODAL ──────────────────────────────────

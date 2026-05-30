@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTICOM - Payment History</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .history-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        .history-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 2rem;
+        }
+
+        /* STATS ROW */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #3a3535;
+            border-radius: 14px;
+            padding: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e3bfdb;
+            margin: 0;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }
+
+        /* FILTER TABS */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 7px 18px;
+            border-radius: 50px;
+            border: 1px solid rgba(227,191,219,0.25);
+            background: rgba(110,48,120,0.2);
+            color: #e3bfdb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: #6e3078;
+            border-color: #e3bfdb;
+            color: white;
+        }
+
+        /* TRANSACTION CARDS */
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-card {
+            background: #3a3535;
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .transaction-card:hover {
+            border-color: rgba(227,191,219,0.2);
+        }
+
+        .transaction-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.paypal { background: rgba(0,48,135,0.3); }
+        .transaction-icon.gcash  { background: rgba(0,115,200,0.3); }
+        .transaction-icon.other  { background: rgba(110,48,120,0.3); }
+
+        .transaction-info { min-width: 0; }
+
+        .transaction-desc {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin: 0 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .transaction-meta {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin: 0;
+        }
+
+        .transaction-right { text-align: right; flex-shrink: 0; }
+
+        .transaction-amount {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #4caf50;
+            margin: 0 0 4px;
+        }
+
+        .transaction-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed { background: rgba(76,175,80,0.2); color: #4caf50; }
+        .status-pending   { background: rgba(255,193,7,0.2);  color: #ffc107; }
+        .status-failed    { background: rgba(244,67,54,0.2);  color: #f44336; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-text { font-size: 15px; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; }
+        .empty-sub  { font-size: 13px; }
+
+        /* LOADING */
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .transaction-card { flex-direction: column; align-items: flex-start; }
+            .transaction-right { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="main-header">
+        <a href="javascript:history.back()" class="brand-container-link">
+            <img src="homepage.png" alt="ARTICOM Logo" class="brand-logo">
+            <h1 class="brand-name">ARTICOM</h1>
+        </a>
+        <div class="header-buttons">
+            <div class="dropdown-container mail-container">
+                <button class="header-btn mail-btn" title="Notifications">🔔</button>
+                <div class="big-panel"><input type="text" placeholder="No new notifications.." class="msg-search"></div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn user-btn" title="Profile">👤</button>
+                <div class="dropdown-panel">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                            <div id="headerInitial" style="width:48px;height:48px;border-radius:50%;background:#6e3078;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;">?</div>
+                            <div>
+                                <p id="headerName" style="font-weight:600;font-size:14px;margin:0;">My Account</p>
+                                <p id="headerRole" style="font-size:12px;opacity:0.6;margin:0;">User</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='client-home.html'" style="width:100%;padding:9px;background:#6e3078;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;">🏠 Home</button>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button class="header-btn settings-btn" title="Settings">⚙️</button>
+                <div class="dropdown-panel"><ul id="Settings"></ul></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="history-wrapper">
+        <h1 class="history-title">💳 Payment History</h1>
+        <p class="history-subtitle">All your transactions in one place</p>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <p class="stat-value" id="statTotal">0</p>
+                <p class="stat-label">Total Transactions</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-value" id="statAmount" style="color:#4caf50;">₱0</p>
+                <p class="stat-label">Total Amount</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-value" id="statCompleted">0</p>
+                <p class="stat-label">Completed</p>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-tabs">
+            <span class="filter-tab active" data-filter="all">All</span>
+            <span class="filter-tab" data-filter="paypal">PayPal</span>
+            <span class="filter-tab" data-filter="gcash">GCash</span>
+            <span class="filter-tab" data-filter="completed">Completed</span>
+            <span class="filter-tab" data-filter="pending">Pending</span>
+        </div>
+
+        <!-- TRANSACTION LIST -->
+        <div class="transaction-list" id="transactionList">
+            <div class="loading-state">⏳ Loading transactions...</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        var currentUser = {};
+        try { currentUser = JSON.parse(localStorage.getItem('articom-user') || '{}'); } catch(e) {}
+        var role = localStorage.getItem('articom-role') || 'user';
+
+        // Set header
+        if (currentUser.fullname) {
+            document.getElementById('headerName').textContent = currentUser.fullname;
+            document.getElementById('headerInitial').textContent = currentUser.fullname.charAt(0).toUpperCase();
+        }
+        document.getElementById('headerRole').textContent = role === 'artist' ? 'Artist' : 'Client';
+
+        var allTransactions = [];
+        var activeFilter    = 'all';
+
+        // ── LOAD TRANSACTIONS ─────────────────────────────────
+        if (!currentUser.id) {
+            document.getElementById('transactionList').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">🔒</div><p class="empty-text">Please login first</p></div>';
+        } else {
+            fetch('/api/my-transactions/' + currentUser.id)
+              .then(function(r) { return r.json(); })
+              .then(function(rows) {
+                allTransactions = rows;
+                updateStats(rows);
+                renderTransactions(rows);
+              })
+              .catch(function() {
+                document.getElementById('transactionList').innerHTML =
+                    '<div class="empty-state"><div class="empty-icon">❌</div><p class="empty-text">Failed to load transactions</p></div>';
+              });
+        }
+
+        // ── UPDATE STATS ──────────────────────────────────────
+        function updateStats(rows) {
+            document.getElementById('statTotal').textContent = rows.length;
+            var total = rows.reduce(function(sum, t) {
+                var amt = parseFloat(t.amount) || 0;
+                return sum + amt;
+            }, 0);
+            document.getElementById('statAmount').textContent = '₱' + total.toFixed(2);
+            var completed = rows.filter(function(t) { return t.status === 'completed'; }).length;
+            document.getElementById('statCompleted').textContent = completed;
+        }
+
+        // ── RENDER TRANSACTIONS ───────────────────────────────
+        function renderTransactions(rows) {
+            var list = document.getElementById('transactionList');
+
+            var filtered = rows.filter(function(t) {
+                if (activeFilter === 'all')       return true;
+                if (activeFilter === 'paypal')    return (t.payment_method || '').toLowerCase() === 'paypal';
+                if (activeFilter === 'gcash')     return (t.payment_method || '').toLowerCase() === 'gcash';
+                if (activeFilter === 'completed') return t.status === 'completed';
+                if (activeFilter === 'pending')   return t.status === 'pending';
+                return true;
+            });
+
+            if (!filtered.length) {
+                list.innerHTML =
+                    '<div class="empty-state">' +
+                        '<div class="empty-icon">💳</div>' +
+                        '<p class="empty-text">No transactions found</p>' +
+                        '<p class="empty-sub">Your payments will appear here</p>' +
+                    '</div>';
+                return;
+            }
+
+            list.innerHTML = filtered.map(function(t) {
+                var method  = (t.payment_method || 'other').toLowerCase();
+                var icon    = method === 'paypal' ? '🅿️' : method === 'gcash' ? '📱' : '💰';
+                var iconCls = method === 'paypal' ? 'paypal' : method === 'gcash' ? 'gcash' : 'other';
+                var status  = t.status || 'completed';
+                var statusCls = 'status-' + status;
+                var amount  = parseFloat(t.amount || 0).toFixed(2);
+                var desc    = t.description || 'Payment';
+                var date    = t.created ? new Date(t.created).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date';
+                var from    = t.client_name ? 'From: ' + t.client_name : '';
+                var to      = t.artist_name ? 'To: ' + t.artist_name : '';
+                var meta    = [date, from, to].filter(Boolean).join(' • ');
+
+                return '<div class="transaction-card">' +
+                    '<div class="transaction-left">' +
+                        '<div class="transaction-icon ' + iconCls + '">' + icon + '</div>' +
+                        '<div class="transaction-info">' +
+                            '<p class="transaction-desc">' + desc + '</p>' +
+                            '<p class="transaction-meta">' + meta + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="transaction-right">' +
+                        '<p class="transaction-amount">₱' + amount + '</p>' +
+                        '<span class="transaction-status ' + statusCls + '">' + status + '</span>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // ── FILTER TABS ───────────────────────────────────────
+        document.querySelectorAll('.filter-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                activeFilter = this.getAttribute('data-filter');
+                renderTransactions(allTransactions);
+            });
+        });
+    </script>
+</body>
+</html>
