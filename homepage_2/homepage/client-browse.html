@@ -471,57 +471,68 @@
             label:  'pay'
         },
 
-        createOrder: function(data, actions) {
-            var price = artwork.description
-                ? artwork.description.replace('₱','').trim()
-                : '5.00';
-            if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) price = '5.00';
+      createOrder: function(data, actions) {
+    // Get price — default to $1.00 for sandbox testing
+    var rawPrice = artwork.description
+        ? artwork.description.replace('₱','').replace('$','').trim()
+        : '1.00';
+    var price = parseFloat(rawPrice);
+    
+    // Sandbox limit is usually $10,000 — but use small amount for testing
+    if (isNaN(price) || price <= 0) price = 1.00;
+    if (price > 999) price = 999.00; // cap for sandbox
+    
+    price = price.toFixed(2);
 
-            return fetch('/api/paypal/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount:      price,
-                    description: 'Payment for: ' + artwork.title
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (!data.success) { alert('Failed to create order: ' + data.message); return null; }
-                return data.orderID;
-            });
-        },
+    return fetch('/api/paypal/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            amount:      price,
+            description: 'Payment for: ' + artwork.title
+        })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (!data.success) { alert('Failed: ' + data.message); return null; }
+        return data.orderID;
+    });
+},
 
-        onApprove: function(data, actions) {
-            // show loading
-            var status = document.getElementById('paypal-status');
-            status.style.display = 'block';
-            status.style.color   = '#e3bfdb';
-            status.textContent   = '⏳ Processing payment...';
+      onApprove: function(data, actions) {
+    var status = document.getElementById('paypal-status');
+    status.style.display = 'block';
+    status.style.color   = '#e3bfdb';
+    status.textContent   = '⏳ Processing payment...';
 
-            return fetch('/api/paypal/capture-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderID:     data.orderID,
-                    client_id:   user.id || null,
-                    artist_id:   currentPaypalArtwork.artist_id || null,
-                    amount:      currentPaypalArtwork.description
-                                   ? currentPaypalArtwork.description.replace('₱','').trim()
-                                   : '5.00',
-                    description: 'Payment for: ' + currentPaypalArtwork.title
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(result) {
-                if (result.success) {
-                    showReceipt(result.receipt, currentPaypalArtwork);
-                } else {
-                    status.style.color = '#ff6b6b';
-                    status.textContent = '❌ Payment failed: ' + (result.message || 'Unknown error');
-                }
-            });
-        },
+    var rawPrice = artwork.description
+        ? artwork.description.replace('₱','').replace('$','').trim()
+        : '1.00';
+    var price = parseFloat(rawPrice);
+    if (isNaN(price) || price <= 0) price = 1.00;
+    if (price > 999) price = 999.00;
+
+    return fetch('/api/paypal/capture-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID:     data.orderID,
+            client_id:   user.id || null,
+            artist_id:   currentPaypalArtwork.artist_id || null,
+            amount:      price.toFixed(2),
+            description: 'Payment for: ' + currentPaypalArtwork.title
+        })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+        if (result.success) {
+            showReceipt(result.receipt, currentPaypalArtwork);
+        } else {
+            status.style.color = '#ff6b6b';
+            status.textContent = '❌ Payment failed. Try again.';
+        }
+    });
+},
 
         onError: function(err) {
             var status = document.getElementById('paypal-status');
